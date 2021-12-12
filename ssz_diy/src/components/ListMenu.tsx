@@ -19,19 +19,19 @@ export default function ListMenu(props: ListProps) {
   const [list, setList] = useState(false);
   const [bitList, setBitList] = useState(false);
   const [union, setUnion] = useState(false);
-  const [type, setType] = useState("");
-  const [limit, setLimit] = useState(1);
+  const [type, setType] = useState("Type");
+  const [limit, setLimit] = useState<number | string>("Limit");
   const [byteLength, setByteLength] = useState("");
   const [typeOptions, setTypeOptions] = useState(``);
   const [menu, setMenu] = useState<ReactElement | undefined>();
 
   useEffect(() => {
-    props.setString(`<elementType: ${type}${typeOptions}, limit: ${limit}>`);
+    props.setString(`[${type}${typeOptions}, ${limit}]`);
   });
 
   useEffect(() => {
     switch (type) {
-      case "BooleanType":
+      case "Boolean":
         setMenu(undefined);
         setBoolean(true);
         setUint(false);
@@ -41,7 +41,7 @@ export default function ListMenu(props: ListProps) {
         setBitList(false);
         setUnion(false);
         break;
-      case "UintType":
+      case "Uint":
         setMenu(<UintMenu setString={setTypeOptions} />);
         setBoolean(false);
         setUint(true);
@@ -51,7 +51,7 @@ export default function ListMenu(props: ListProps) {
         setBitList(false);;
         setUnion(false);
         break;
-      case "VectorType":
+      case "Vector":
         setMenu(<VectorMenu setString={setTypeOptions} />);
         setBoolean(false);
         setUint(false);
@@ -61,7 +61,7 @@ export default function ListMenu(props: ListProps) {
         setBitList(false);;
         setUnion(false);
         break;
-      case "BitVectorType":
+      case "BitVector":
         setMenu(<BitVectorMenu setString={setTypeOptions} />);
         setBoolean(false);
         setUint(false);
@@ -71,7 +71,7 @@ export default function ListMenu(props: ListProps) {
         setBitList(false);;
         setUnion(false);
         break;
-      case "ListType":
+      case "List":
         setMenu(<ListMenu setString={setTypeOptions} />);
         setBoolean(false);
         setUint(false);
@@ -81,7 +81,7 @@ export default function ListMenu(props: ListProps) {
         setBitList(false);
         setUnion(false);
         break;
-      case "BitListType":
+      case "BitList":
         setMenu(<BitListMenu setString={setTypeOptions} />);
         setBoolean(false);
         setUint(false);
@@ -91,7 +91,7 @@ export default function ListMenu(props: ListProps) {
         setBitList(true);
                 setUnion(false);
         break;
-      case "UnionType":
+      case "Union":
         setMenu(<UnionMenu />);
         setBoolean(false);
         setUint(false);
@@ -106,9 +106,12 @@ export default function ListMenu(props: ListProps) {
 
   return (
     <div className="row ps-2 ms-2">
-      <div className="col">
-        <div className="row p-2">
-          Set Limit: {limit}
+      <div className="col pt-2 mt-2">
+        <div className="row">
+          <SelectBasicType name="elementType" setType={setType} />
+        </div>
+        <div className="row p-2"><h3>
+          Set Limit: {limit}  
           <input
             type="range"
             className="form-range"
@@ -116,10 +119,7 @@ export default function ListMenu(props: ListProps) {
             max="32"
             id="customRange3"
             onChange={(e) => setLimit(2 ** Number(e.target.value))}
-          />
-        </div>
-        <div className="row">
-          <SelectBasicType name="elementType" setType={setType} />
+          /></h3>
         </div>
       </div>
 

@@ -17,19 +17,19 @@ export default function VectorMenu(props: VectorProps) {
   const [vector, setVector] = useState(false);
   const [list, setList] = useState(false);
   const [union, setUnion] = useState(false);
-  const [type, setType] = useState("");
-  const [length, setLength] = useState(1);
+  const [type, setType] = useState("type");
+  const [length, setLength] = useState<string | number>("length");
   const [byteLength, setByteLength] = useState("");
   const [typeOptions, setTypeOptions] = useState(``);
   const [menu, setMenu] = useState<ReactElement | undefined>();
 
   useEffect(() => {
-    props.setString(`<elementType: ${type}${typeOptions}, length: ${length}>`);
+    props.setString(`[${type}${typeOptions}, ${length}]`);
   });
 
   useEffect(() => {
     switch (type) {
-      case "BooleanType":
+      case "Boolean":
         setMenu(undefined);
         setBoolean(true);
         setUint(false);
@@ -37,7 +37,7 @@ export default function VectorMenu(props: VectorProps) {
         setList(false);
         setUnion(false);
         break;
-      case "UintType":
+      case "Uint":
         setMenu(<UintMenu setString={setTypeOptions} />);
         setBoolean(false);
         setUint(true);
@@ -45,7 +45,7 @@ export default function VectorMenu(props: VectorProps) {
         setList(false);
         setUnion(false);
         break;
-      case "VectorType":
+      case "Vector":
         setMenu(<VectorMenu setString={setTypeOptions} />);
         setBoolean(false);
         setUint(false);
@@ -53,7 +53,7 @@ export default function VectorMenu(props: VectorProps) {
         setList(false);
         setUnion(false);
         break;
-      case "ListType":
+      case "List":
         setMenu(<ListMenu setString={setTypeOptions} />);
         setBoolean(false);
         setUint(false);
@@ -61,7 +61,7 @@ export default function VectorMenu(props: VectorProps) {
         setList(true);
         setUnion(false);
         break;
-      case "UnionType":
+      case "Union":
         setMenu(<UnionMenu />);
         setBoolean(false);
         setUint(false);
@@ -79,10 +79,7 @@ export default function VectorMenu(props: VectorProps) {
         <div className="row">
           <SelectBasicType name="elementType" setType={setType} />
         </div>
-      </div>
-
-      <div className="col">
-        <div className="row justify-content-start py-2">
+{type !== "" &&        <div className="row justify-content-start py-2">
           Set Vector Length: 
             <input
               type="number"
@@ -90,8 +87,11 @@ export default function VectorMenu(props: VectorProps) {
               min={1}
               onChange={(e) => setLength(Number(e.target.value))}
             />
-        </div>
-        <div className="row">{menu && menu}</div>
+        </div>}
+      </div>
+
+      <div className="col">
+          <div className="row">{menu && menu}</div>
       </div>
     </div>
   );

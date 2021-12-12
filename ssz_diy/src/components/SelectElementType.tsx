@@ -21,7 +21,7 @@ export default function SelectElementType(props: SelectElementTypeProps) {
               <option disabled value="SSZ Type" selected>Select {props.name}</option>
               {types.map((type: string) => {
                 return (
-                  <option value={`${type}Type`}>{type}</option>
+                  <option value={`${type}`}>{type}</option>
 
                 )
               })}

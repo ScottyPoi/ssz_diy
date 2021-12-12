@@ -1,10 +1,4 @@
-import { ReactElement, useEffect, useState } from "react";
-import BooleanMenu from "./BooleanMenu";
-import ListMenu from "./ListMenu";
-import SelectBasicType from "./SelectBasicType";
-import SelectElementType from "./SelectElementType";
-import { UintMenu } from "./UintMenu";
-import UnionMenu from "./UnionMenu";
+import { useEffect, useState } from "react";
 
 type BitVectorProps = {
   setString: Function;

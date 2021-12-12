@@ -12,7 +12,7 @@ import VectorMenu from "./VectorMenu";
 
 type InputProps = {};
 
-const _types = ["Boolean", "Uint", "Vector", "List", "Union", "Container", "Example_Message"]
+const _types = ["boolean", "uint", "Vector", "List", "Union", "Container"]
 let basicTypes = ["Uint", "Boolean"];
 let uintTypes = ["Uint8", "Uint16", "Uint32", "Uint64", "Uint128", "Uint256"];
 
@@ -27,7 +27,7 @@ export default function Input (props: InputProps) {
     const [container, setContainer] = useState(false);
     const [example, setExample] = useState(false);
     //
-    const [name, setName] = useState("[USER_TYPE]");
+    const [name, setName] = useState("[USER_TYPE_ALIAS]");
     const [types, setTypes] = useState(_types)
     const [basicVector, setBasicVector] = useState(false);
   const [compositeVector, setCompositeVector] = useState(false);
@@ -51,7 +51,7 @@ export default function Input (props: InputProps) {
   useEffect(() => {
     setString("");
     switch (type) {
-      case "BooleanType":
+      case "Boolean":
         setBoolean(true);
         setUint(false);
         setVector(false);
@@ -62,7 +62,7 @@ export default function Input (props: InputProps) {
         setContainer(false);
         setExample(false);
         break;
-      case "UintType":
+      case "Uint":
         setBoolean(false);
         setUint(true);
         setVector(false);
@@ -73,7 +73,7 @@ export default function Input (props: InputProps) {
         setContainer(false);
         setExample(false);
         break;
-      case "VectorType":
+      case "Vector":
         setBoolean(false);
         setUint(false);
         setVector(true);
@@ -84,7 +84,7 @@ export default function Input (props: InputProps) {
         setContainer(false);
         setExample(false);
         break;
-      case "BitVectorType":
+      case "BitVector":
         setBoolean(false);
         setUint(false);
         setVector(false);
@@ -95,7 +95,7 @@ export default function Input (props: InputProps) {
         setContainer(false);
         setExample(false);
         break;
-      case "ListType":
+      case "List":
         setBoolean(false);
         setUint(false);
         setVector(false);
@@ -106,7 +106,7 @@ export default function Input (props: InputProps) {
         setContainer(false);
         setExample(false);
         break;
-      case "BitListType":
+      case "BitList":
         setBoolean(false);
         setUint(false);
         setVector(false);
@@ -117,7 +117,7 @@ export default function Input (props: InputProps) {
         setContainer(false);
         setExample(false);
         break;
-      case "UnionType":
+      case "Union":
         setBoolean(false);
         setUint(false);
         setVector(false);
@@ -128,7 +128,7 @@ export default function Input (props: InputProps) {
         setContainer(false);
         setExample(false);
         break;
-      case "ContainerType":
+      case "Container":
         setBoolean(false);
         setUint(false);
         setVector(false);
@@ -139,7 +139,7 @@ export default function Input (props: InputProps) {
         setContainer(true);
         setExample(false);
         break;
-      case "Example_MessageType":
+      case "Example_Message":
         setBoolean(false);
         setUint(false);
         setVector(false);
@@ -170,11 +170,14 @@ export default function Input (props: InputProps) {
   }
 
   return (
+    <div className="container p-1 m-2 border">
     <div className="row">
       <div className="col-4">
+          <h3>
         <div className="row align-items-center">
-          <div className="col-3">Type Alias: </div>
-          <div className="col-9">
+New Type Alias: 
+</div>
+          <div className="row">
             <input
               type="string"
               value={name}
@@ -182,20 +185,22 @@ export default function Input (props: InputProps) {
               className="form-control"
               id="exampleFormControlTextarea1"
             ></input>
-          </div>
         </div>
+        </h3>
         <SelectElementType name="SSZ Type" setType={setType} types={types}/>
+        </div>
+        <div className='col'>
         {uint && <UintMenu setString={setString} />}
         {vector && <VectorMenu setString={setString} />}
         {list && <ListMenu setString={setString} />}
         {union && <UnionMenu />}
-        {container && <ContainerMenu />}
+        {container && <ContainerMenu setString={setString} />}
         {example && <ExampleMessage />}
       </div>
       <div className="col-8">
         <div className="row">
           <h3>
-            type {name} = {type}
+           {name} = {type}
             {string}
           </h3>
         </div>
@@ -204,13 +209,14 @@ export default function Input (props: InputProps) {
             <button className="btn btn-secondary " style={{ border: "solid", borderColor: "black", textAlign: "center" }} onClick={() => createType()}>
               <h3 >
                 {" "}
-                CREATE TYPE
+                CREATE TYPE ALIAS
               </h3>
             </button>
           </div>
         <Prompt log={log} />
         </div>
       </div>
+    </div>
     </div>
   );
 }

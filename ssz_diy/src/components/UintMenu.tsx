@@ -4,24 +4,25 @@ type UintProps = {
     setString: Function
 }
 export function UintMenu(props: UintProps) {
-    const [byteLength, setByteLength] = useState("")
+    const [n, setN] = useState("N")
 
     useEffect(() => {
-      props.setString(`<byteLength: ${byteLength}>`)
+      props.setString(`${n}`)
     })
 
     return (
         <select
         className="form-select form-select-lg mb-3"
         aria-label=".form-select-lg SSZ Type"
-        onChange={(e) => setByteLength(e.target.value)}
+        onChange={(e) => setN(e.target.value)}
+        size={7}
       >
-        <option selected>Select Bytelength</option>
-        <option value="8">byteLength: 8</option>
-        <option value="16">byteLength: 16</option>
-        <option value="32">byteLength: 32</option>
-        <option value="64">byteLength: 64</option>
-        <option value="128">byteLength: 128</option>
-        <option value="128">byteLength: 256</option>
+        <option value="N" selected>Select uintN</option>
+        <option value="8">uint8</option>
+        <option value="16">uint16</option>
+        <option value="32">uint32</option>
+        <option value="64">uint64</option>
+        <option value="128">uint128</option>
+        <option value="128">uint256</option>
       </select>    )
 }

@@ -13,8 +13,12 @@ type SelectBasicTypeProps = {
                   onChange={(e) => props.setType(e.target.value)}
                 >
                   <option disabled value="SSZ Type" selected>Select {props.name}</option>
-                  <option value="BooleanType">Boolean</option>
-                  <option value="UintType">Uint</option>
+                  <option value="Uint">Uint</option>
+                  <option value="Alias">Alias</option>
+                  <option value="Alias">Alias</option>
+                  <option value="Alias">Alias</option>
+                  <option value="Alias">Alias</option>
+                  <option value="Alias">Alias</option>
                 </select>
               </div>
             )
