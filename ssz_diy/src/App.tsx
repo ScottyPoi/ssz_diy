@@ -1,61 +1,32 @@
 import { BrowserRouter as Router } from "react-router-dom";
 import "./style/App.scss";
-import Input from "./components/Input";
-import CreateValue from "./components/CreateValue";
-import { useEffect, useState } from "react";
-import AliasMenu from "./components/AliasMenu";
 import Serialize from "./components/Serialize";
-import { ByteVectorType, toHexString } from "@chainsafe/ssz";
+import { ByteVectorType } from '@chainsafe/ssz';
+import Modal from "./components/CreateType";
+import { useState } from "react";
+import EventEmitter from "events";
 
 const ByteVector96 = new ByteVectorType({length: 96})
-const s: any = [];
+export type bytes96 = typeof ByteVector96
+const s: number[] = [];
 for (let index = 0; index < 96; index++) {
     s.push(Math.floor(Math.random() * 255));
     
 }
-const ser = toHexString(ByteVector96.serialize(s))
-const htr = toHexString(ByteVector96.hashTreeRoot(s))
-const cd = ByteVector96.getFixedSerializedLength()
+const u8a = Uint8Array.from(s)
 
-const example: any[] = [s, ser, htr, cd]
+const exampleType = ByteVector96
+const exampleData = u8a
+
 function App() {
-  const [types, setTypes] = [
-    "Boolean",
-    "Uint",
-    "Vector",
-    "List",
-    "Union",
-    "Container",
-    "Example_Message",
-  ];
-  const [aliasList, setAliasList] = useState([
-    "Bit",
-    "Byte",
-    "ByteVector",
-    "Bytes32",
-    "ByteList",
-    "ExampleMessage",
-    "ExamplePayload",
-  ]);
-  const [newAlias, setNewAlias] = useState("");
-  const [value, setValue] = useState<any>(s)
-  const [serialized, setSerialized] = useState<string>(ser)
-  const [hashTreeRoot, setHashTreeRoot] = useState<string>(htr)
-  useEffect(() => {
-    let list = [...aliasList];
-    list.push(newAlias);
-    setAliasList(list);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newAlias]);
-
 
 
   return (
     <Router>
       {/* <AliasMenu /> */}
       {/* <Input /> */}
-      <Serialize example={example} value={s} serialized={serialized} htr={hashTreeRoot} userTypes={["Byte", "ByteVector", "Bytes32", "Bytes48", "Bytes96"]}/>
-      {/* <CreateValue aliasList={aliasList} create={setNewAlias}/> */}
+      <Serialize exampleData={exampleData} exampleType={exampleType} userTypes={["ByteVector", "Bytes2", "Bytes4", "Bytes8", "Bytes16","Bytes20", "Bytes32", "Bytes48", "Bytes96"]}/>
+        {/* <CreateValue aliasList={aliasList} create={setNewAlias}/> */}
     </Router>
   );
 }
