@@ -249,7 +249,7 @@ export default function Serialize(props: SerializeProps) {
               </div>
             </div>
             <div className="col">
-              {<InputBox makeInfo={makeInfo} type={typeSelect} mode={inputMode} data={values} />}
+              {<InputBox makeInfo={makeInfo}/>}
             </div>
           </div>
           <div className="row w-100">

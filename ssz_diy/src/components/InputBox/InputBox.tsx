@@ -1,34 +1,32 @@
-import { BasicType, CompositeType, toHexString } from "@chainsafe/ssz";
-import DeserializeInputBox from "./DeserializeInputBox";
-import SerializeInputBox from "./SerializeInputBox";
-import ValidateInputBox from "./ValidateInputBox";
+import { BasicType, CompositeType } from "@chainsafe/ssz";
+import UploadFile from "../UploadFile";
+
 
 interface InputProps {
-  mode: number;
-  type: BasicType<any> | CompositeType<any>;
-  data: number | unknown[] | bigint | boolean;
-  makeInfo: () => Promise<void>
+  makeInfo: () => Promise<void>;
 }
 
 export default function InputBox(props: InputProps) {
-  const data = props.data
-  const ser = props.type.serialize(data);
-  const htr = props.type.hashTreeRoot(data);
-  const values = props.data
-
-  const m = props.mode;
-  const mode =
-    m === 0 ? (
-      <SerializeInputBox makeInfo={props.makeInfo} value={values.toString() as string} ser={toHexString(ser)} />
-    ) : m === 1 ? (
-      <DeserializeInputBox htr={toHexString(htr)} />
-    ) : (
-      <ValidateInputBox
-        value={props.type.toJson(data)?.toString() as string}
-        htr={toHexString(htr)}
-        serialized={toHexString(ser)}
-      />
-    );
-
-  return <div className="d-flex flex-box">{mode}</div>;
+  return (
+    <div className="d-flex flex-box">
+      {" "}
+      <div className="col">
+        <div className="row">
+          <div className="col">
+            {/* <div className="text-center col p-0 m-0">DATA:</div> */}
+            <UploadFile />
+          </div>
+          <div className="col">
+            <button
+              onClick={async () => await props.makeInfo()}
+              className="btn btn-secondary"
+              type="button"
+            >
+              Use Random Data
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
