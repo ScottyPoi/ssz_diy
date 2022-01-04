@@ -249,11 +249,10 @@ export default function Serialize(props: SerializeProps) {
               </div>
             </div>
             <div className="col">
-              {<InputBox type={typeSelect} mode={inputMode} data={values} />}
+              {<InputBox makeInfo={makeInfo} type={typeSelect} mode={inputMode} data={values} />}
             </div>
           </div>
           <div className="row w-100">
-            <button onClick={async () => await makeInfo()} className="btn btn-secondary" type='button'>Use Random Data</button>
             {showInfo}
           </div>
         </div>

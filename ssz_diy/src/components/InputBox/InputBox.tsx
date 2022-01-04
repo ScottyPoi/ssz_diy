@@ -6,7 +6,8 @@ import ValidateInputBox from "./ValidateInputBox";
 interface InputProps {
   mode: number;
   type: BasicType<any> | CompositeType<any>;
-  data: number | unknown[] | bigint | boolean
+  data: number | unknown[] | bigint | boolean;
+  makeInfo: () => Promise<void>
 }
 
 export default function InputBox(props: InputProps) {
@@ -18,7 +19,7 @@ export default function InputBox(props: InputProps) {
   const m = props.mode;
   const mode =
     m === 0 ? (
-      <SerializeInputBox value={values.toString() as string} ser={toHexString(ser)} />
+      <SerializeInputBox makeInfo={props.makeInfo} value={values.toString() as string} ser={toHexString(ser)} />
     ) : m === 1 ? (
       <DeserializeInputBox htr={toHexString(htr)} />
     ) : (

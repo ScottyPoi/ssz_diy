@@ -4,6 +4,7 @@ import UploadFile from "../UploadFile";
 interface SerializeInputBoxProps {
   value: string;
   ser: string;
+  makeInfo: () => Promise<void>
 }
 
 export default function SerializeInputBox(props: SerializeInputBoxProps) {
@@ -17,13 +18,19 @@ export default function SerializeInputBox(props: SerializeInputBoxProps) {
   return (
     <div className="col">
       <div className="row">
+    <div className="col">
         {/* <div className="text-center col p-0 m-0">DATA:</div> */}
         <UploadFile />
       </div>
-      <div className="row">
-        <input readOnly type="text" value={data} />
+    <div className="col">
+    <button onClick={async () => await props.makeInfo()} className="btn btn-secondary" type='button'>Use Random Data</button>
+
       </div>
-      <div className="row">
+      </div>
+      {/* <div className="row">
+        <input readOnly type="text" value={data} />
+      </div> */}
+      {/* <div className="row">
         <div
           className="btn-group btn-group-sm"
           role="group"
@@ -59,7 +66,7 @@ export default function SerializeInputBox(props: SerializeInputBoxProps) {
             Serialized
           </label>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
