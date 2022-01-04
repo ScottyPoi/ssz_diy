@@ -38,10 +38,7 @@ export default function SelectType(props: SelectTypeProps) {
           value={props._type}
         >
           {Object.keys(props.nativeTypes).map((type, idx) => {
-            return (
-              <>
-              {type}
-              {props.nativeTypes[type].map((_type) => {
+            return props.nativeTypes[type].map((_type) => {
                 return (
                   <option key={_type} value={_type}>
                   {_type}
@@ -49,9 +46,8 @@ export default function SelectType(props: SelectTypeProps) {
               );
             })
           }
-          </>
-            )
-          })}
+            
+          )}
           {/* <option disabled>Lodestar Types</option>
               {[...Object.keys(ssz.altair), ...Object.keys(ssz)].filter((n) => !typeNames.includes(n)).sort().map((type) => {
                 return <option key={type} value={type}>{type}</option>;

@@ -1,4 +1,4 @@
-import { BasicListType, BasicType, BasicVectorType, BitListType, BitVectorType, BooleanType, isBigIntUintType, isBooleanType, isNumberUintType, List, UintType, Vector } from "@chainsafe/ssz";
+import { BasicListType, BasicType, BasicVectorType, BitListType, BitVectorType, isBigIntUintType, isBooleanType, isNumberUintType, List, UintType, Vector } from "@chainsafe/ssz";
  export default function hey() {} 
 export   function randBasic(type: BasicType<any>): number | bigint | boolean {
   let numType = type as UintType<any>

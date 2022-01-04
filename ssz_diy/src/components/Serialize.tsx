@@ -22,7 +22,6 @@ import {
   isUintType,
   isBooleanType,
   BitVector,
-  List,
   BitList,
 } from "@chainsafe/ssz";
 import { randBasic, randList, randVector } from "./randUint";
@@ -31,6 +30,7 @@ import InfoTable from "./OutputBox.tsx/InfoTable";
 import SetLength from "./setLength";
 import SetElementType from "./SetElementType";
 import { SetLimit } from "./SetLimit";
+import RandomData from "../RandomData";
 
 interface SerializeProps {
   userTypes: string[];
@@ -86,11 +86,11 @@ export default function Serialize(props: SerializeProps) {
         });
       }
     });
-    makeInfo().then((res) => {return});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [typeSelect]);
   useEffect(() => {
     getTypeName().then((_type) => {
+      setShowInfo(<></>)
       const t =
         _type === "Boolean"
           ? new BooleanType()
@@ -112,24 +112,24 @@ export default function Serialize(props: SerializeProps) {
           : _type === "List"
           ? new BasicListType({ limit: listLimit, elementType: elementType })
           : new BooleanType();
-      if (isBasicType(t)) {
-        setValues(randBasic(t));
-      } else if (isCompositeType(t)) {
-        if (isVectorType(t)) {
-          const data = randVector(t);
-          const vals = isBitVectorType(t)
-            ? t.tree_iterateValues(t.struct_convertToTree(data as BitVector))
-            : t.tree_iterateValues(t.struct_convertToTree(data));
-          setValues(Array.from(vals));
-        } else if (isListType(t)) {
-          const data = randList(t);
-          const vals = isBitListType(t)
-            ? t.tree_iterateValues(t.struct_convertToTree(data as BitList))
-            : t.tree_iterateValues(t.struct_convertToTree(data));
+      // if (isBasicType(t)) {
+      //   setValues(randBasic(t));
+      // } else if (isCompositeType(t)) {
+      //   if (isVectorType(t)) {
+      //     const data = randVector(t);
+      //     const vals = isBitVectorType(t)
+      //       ? t.tree_iterateValues(t.struct_convertToTree(data as BitVector))
+      //       : t.tree_iterateValues(t.struct_convertToTree(data));
+      //     setValues(Array.from(vals));
+      //   } else if (isListType(t)) {
+      //     const data = randList(t);
+      //     const vals = isBitListType(t)
+      //       ? t.tree_iterateValues(t.struct_convertToTree(data as BitList))
+      //       : t.tree_iterateValues(t.struct_convertToTree(data));
 
-          setValues(Array.from(vals));
-        }
-      }
+      //     setValues(Array.from(vals));
+      //   }
+      // }
       setTypeSelect(t);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -167,8 +167,10 @@ export default function Serialize(props: SerializeProps) {
 
   async function makeInfo() {
     const t = await getTypeSelect()
-    const v = await getValues()
-    setShowInfo(<InfoTable data={v} type={t} />);
+    RandomData({t, setValues}).then((values) => {
+      setValues(values)
+      setShowInfo(<InfoTable data={values} type={typeSelect} />);
+    })
   }
 
   return (
@@ -251,6 +253,7 @@ export default function Serialize(props: SerializeProps) {
             </div>
           </div>
           <div className="row w-100">
+            <button onClick={async () => await makeInfo()} className="btn btn-secondary" type='button'>Use Random Data</button>
             {showInfo}
           </div>
         </div>
