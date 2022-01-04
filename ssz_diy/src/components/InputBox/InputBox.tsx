@@ -1,5 +1,4 @@
-import { BasicType, CompositeType, isBasicType, isCompositeType, toHexString, Type } from "@chainsafe/ssz";
-import { randBasic } from "../randUint";
+import { BasicType, CompositeType, toHexString } from "@chainsafe/ssz";
 import DeserializeInputBox from "./DeserializeInputBox";
 import SerializeInputBox from "./SerializeInputBox";
 import ValidateInputBox from "./ValidateInputBox";

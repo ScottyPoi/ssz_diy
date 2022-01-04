@@ -1,4 +1,4 @@
-import { BasicListType, BasicType, BasicVectorType, BooleanType, CompositeType, isBigIntUintType, isBooleanType, isNumberUintType, List, Number64UintType, NumberUintType, Type, UintType, Vector, VectorType } from "@chainsafe/ssz";
+import { BasicListType, BasicType, BasicVectorType, BitListType, BitVectorType, BooleanType, isBigIntUintType, isBooleanType, isNumberUintType, List, UintType, Vector } from "@chainsafe/ssz";
  export default function hey() {} 
 export   function randBasic(type: BasicType<any>): number | bigint | boolean {
   let numType = type as UintType<any>
@@ -14,7 +14,7 @@ export   function randBasic(type: BasicType<any>): number | bigint | boolean {
       return num
 }
 
-export function randVector(type: BasicVectorType<Vector<UintType<any> | BooleanType>>) {
+export function randVector(type: BasicVectorType<Vector<unknown>> | BitVectorType) {
   let length = type.length;
   let elementType = type.elementType
   let array = [];
@@ -24,10 +24,10 @@ export function randVector(type: BasicVectorType<Vector<UintType<any> | BooleanT
   return array
 }
 
-export function randList(type: BasicListType<List<any>>) {
+export function randList(type: BasicListType<List<unknown>> | BitListType) {
     let limit = type.limit;
-    let length = Math.floor(Math.random() * limit);
-    let elementType: BasicType<unknown> = type.elementType;
+    let length = Math.ceil(Math.random() * limit);
+    let elementType = type.elementType;
     let array = [];
   for (let i = 0; i < length; i++) {
     array.push(randBasic(elementType));

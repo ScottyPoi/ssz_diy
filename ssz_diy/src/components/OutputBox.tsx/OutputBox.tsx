@@ -1,7 +1,7 @@
 import { CompositeType } from "@chainsafe/ssz";
 import { useEffect, useState } from "react";
 import DeserializeOutputBox from "./DeserializeOutputBox";
-import SerializeOutputBox from "./SerializeOutputBox";
+import SerializeOutputBox from "./InfoTable";
 import ValidateOutputBox from "./ValidateOutputBox";
 import { Type } from '@chainsafe/ssz'
 
@@ -39,47 +39,7 @@ export default function OutputBox(props: OutputBoxProps) {
     <div className="container">
       <div className="row">
       {box[modes[mode]]}
-
       </div>
-
-      {/* <div className="row">
-        <div className="row">
-          <div className="btn">Get Proof:</div>
-        </div>
-        <div className="row">
-          <div className="btn-group">
-            {array.map((i, idx) => {
-              return (
-                <>
-                  <input
-                    type="radio"
-                    className="btn-check"
-                    checked={_idx === i}
-                    id={`${i}`}
-                    onClick={() => setIdx(i)}
-                    key={i}
-                  />
-                  <label className="btn btn-outline-primary" htmlFor={`${i}`}>
-                    {i}
-                  </label>
-                </>
-              );
-            })}
-          </div>
-        </div>
-        <div className="row text-break">
-          <text>
-            Proof Nodes: [
-            <span style={{ color: "red" }}>
-              {getProofNodes(_idx).toString()}
-            </span>
-            ]:
-          </text>
-          {proof.map((v) => {
-            return <span style={{ fontSize: "0.7rem" }}>{toHexString(v)}</span>;
-          })}
-        </div>
-      </div> */}
     </div>
   );
 }

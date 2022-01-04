@@ -1,4 +1,3 @@
-import  ssz  from "@chainsafe/ssz";
 import { CompositeType, toHexString, Type } from "@chainsafe/ssz";
 import { useState } from "react";
 

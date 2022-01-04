@@ -1,70 +1,146 @@
 import { useEffect, useState } from "react";
-import { bytes96 } from "../App";
 import InputBox from "./InputBox/InputBox";
-import OutputBox from "./OutputBox.tsx/OutputBox";
-import Tree from "./VisualTree/Tree";
-import { ssz } from "@chainsafe/lodestar-types";
 import {
   BasicType,
   BasicVectorType,
   BigIntUintType,
+  BitVectorType,
   BooleanType,
   CompositeType,
   isBasicType,
   isCompositeType,
+  isBitVectorType,
+  isVectorType,
   Number64UintType,
   NumberUintType,
   Type,
   UintType,
-  VectorType,
+  BasicListType,
+  BitListType,
+  isListType,
+  isBitListType,
+  isUintType,
+  isBooleanType,
+  BitVector,
+  List,
+  BitList,
 } from "@chainsafe/ssz";
-import { Bytes96 } from "@chainsafe/lodestar-types/lib/sszTypes";
-import { randBasic, randVector } from "./randUint";
+import { randBasic, randList, randVector } from "./randUint";
 import SelectType from "./SelectType";
-import UploadFile from "./UploadFile";
-
-const { phase0, altair, merge } = ssz;
-
-export const forks = { ...phase0, ...altair, ...merge } as Record<
-  string,
-  Type<unknown>
->;
-
-export type ForkName = keyof typeof forks;
-
-export function typeNames<T>(types: Record<string, Type<T>>): string[] {
-  return Object.keys(types).sort();
-}
+import InfoTable from "./OutputBox.tsx/InfoTable";
+import SetLength from "./setLength";
+import SetElementType from "./SetElementType";
+import { SetLimit } from "./SetLimit";
 
 interface SerializeProps {
   userTypes: string[];
-  exampleData: number[] | Uint8Array;
-  exampleType: bytes96;
 }
-// function getType(typeName: string): Type<unknown> {
-//   return forks[typeName]
-// }
 
 export default function Serialize(props: SerializeProps) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [inputMode, setInputMode] = useState<number>(0);
-  const [proofNode, setProofNode] = useState<number>(7);
-  const [_type, set_Type] = useState("Boolean");
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [typeSelect, setTypeSelect] = useState<BasicType<any> | CompositeType<any>>(new BooleanType());
+  const [proofNode, setProofNode] = useState<number>(7);
+  const [typeName, setTypeName] = useState("Boolean");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [elementType, setEType] = useState<Type<any>>(
+    new NumberUintType({ byteLength: 8 })
+  );
+  const [vectorLen, setVectorLen] = useState(100);
+  const [listLimit, setListLimit] = useState(512);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [showInfo, setShowInfo] = useState(<></>);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [typeSelect, setTypeSelect] = useState<
+    BasicType<any> | CompositeType<any>
+  >(new BooleanType());
+  const [values, setValues] = useState<number | boolean | bigint | unknown[]>(
+    0
+  );
 
+  async function getTypeSelect() {
+    return typeSelect;
+  }
+  async function getValues() {
+    return values;
+  }
+  async function getTypeName() {
+    return typeName;
+  }
+  async function getEType() {
+    return elementType;
+  }
   useEffect(() => {
+    setShowInfo(<></>);
+    getTypeSelect().then((_type) => {
+      if (isBitListType(_type)) {
+        setListLimit(512);
+      } else if (isListType(_type)) {
+        getEType().then((eType) => {
+          let limit = isBooleanType(eType)
+            ? 512
+            : isUintType(eType)
+            ? 64 / eType.byteLength
+            : 256;
+          setListLimit(limit);
+        });
+      }
+    });
+    makeInfo().then((res) => {return});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [typeSelect]);
+  useEffect(() => {
+    getTypeName().then((_type) => {
+      const t =
+        _type === "Boolean"
+          ? new BooleanType()
+          : _type.substring(0, 4) === "Uint" &&
+            parseInt(_type.substring(4)) / 8 < 64
+          ? new NumberUintType({ byteLength: parseInt(_type.substring(4)) / 8 })
+          : _type.substring(0, 4) === "Uint" &&
+            parseInt(_type.substring(4)) / 8 > 64
+          ? new BigIntUintType({ byteLength: parseInt(_type.substring(4)) / 8 })
+          : _type.substring(0, 4) === "Uint" &&
+            parseInt(_type.substring(4)) / 8 === 64
+          ? new Number64UintType()
+          : _type === "BitVector"
+          ? new BitVectorType({ length: vectorLen })
+          : _type === "Vector"
+          ? new BasicVectorType({ length: vectorLen, elementType: elementType })
+          : _type === "BitList"
+          ? new BitListType({ limit: listLimit })
+          : _type === "List"
+          ? new BasicListType({ limit: listLimit, elementType: elementType })
+          : new BooleanType();
+      if (isBasicType(t)) {
+        setValues(randBasic(t));
+      } else if (isCompositeType(t)) {
+        if (isVectorType(t)) {
+          const data = randVector(t);
+          const vals = isBitVectorType(t)
+            ? t.tree_iterateValues(t.struct_convertToTree(data as BitVector))
+            : t.tree_iterateValues(t.struct_convertToTree(data));
+          setValues(Array.from(vals));
+        } else if (isListType(t)) {
+          const data = randList(t);
+          const vals = isBitListType(t)
+            ? t.tree_iterateValues(t.struct_convertToTree(data as BitList))
+            : t.tree_iterateValues(t.struct_convertToTree(data));
 
-    const t = _type === "Boolean"
-    ? new BooleanType()
-    : _type.substring(0,4) === "Uint" && parseInt(_type.substring(4)) / 8 < 64
-    ? new NumberUintType({byteLength: parseInt(_type.substring(4)) / 8})
-    : _type.substring(0,4) === "Uint" && parseInt(_type.substring(4)) / 8 > 64
-    ? new BigIntUintType({byteLength: parseInt(_type.substring(4)) / 8})
-    : new Number64UintType()
-    setTypeSelect(t)
+          setValues(Array.from(vals));
+        }
+      }
+      setTypeSelect(t);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [typeName, listLimit, vectorLen, elementType]);
 
-  }, [_type])
+  //     useEffect(() => {
+  //       function lenPrompt() {
+  //     onOpen();
+  //   }
+  //   _type === "BitVector" && lenPrompt();
+  // }, [typeSelect, _type, onOpen]);
 
   const nativeTypes: Record<string, string[]> = {
     Basic: [
@@ -82,54 +158,91 @@ export default function Serialize(props: SerializeProps) {
       "BitList",
       "Vector",
       "List",
-      //  "Container", "Union"
     ],
     Container: ["Container"],
     Union: ["Union"],
     Custom: [...props.userTypes],
   };
-  const typeNames = [
-    ...nativeTypes.Basic,
-    ...nativeTypes.Array,
-    ...props.userTypes,
-  ];
 
-  let values: number  | boolean | bigint | unknown[] = 0
-  if (isBasicType(typeSelect)) {
- const _type = typeSelect as BasicType<any>
- values = randBasic(_type)
-  } else if (isCompositeType(typeSelect)) {
-    const data = [0]
-    const _type =  typeSelect as CompositeType<any>
-    values = Array.from(_type.tree_iterateValues(_type.struct_convertToTree(data)))
+
+  async function makeInfo() {
+    const t = await getTypeSelect()
+    const v = await getValues()
+    setShowInfo(<InfoTable data={v} type={t} />);
   }
 
   return (
     <div className="container m-0 p-0 vw-100 vh-100">
-      {randBasic(new Number64UintType())}
-      {randVector(
-        new BasicVectorType({ elementType: new Number64UintType(), length: 55 })
-      )}
+      <div className=" justify-content-center row w-50">
+        <div className="col-4">
+          {/* <VectorPrompt onOpen={onOpen} onClose={onClose} isOpen={isOpen} vectorLen={vectorLen} setVectorLen={setVectorLen} /> */}
+        </div>
+      </div>
       <div className="row m-0 p-0 vh-100 vw-100">
         <SelectType
-          set_Type={set_Type}
-          _type={_type}
-          typeNames={typeNames}
+          set_Type={setTypeName}
+          _type={typeName}
           nativeTypes={nativeTypes}
         />
-        <div className="col-5 h-100 border">
+        <div className="col w-90 h-100 border">
           <div className="row">
             <div className="col">
               <div className="row">Type</div>
               <div className="row">
-                <input readOnly type="text" value={_type} />
+                <input
+                  readOnly
+                  type="text"
+                  value={`${typeName}${
+                    isVectorType(typeSelect)
+                      ? `<length: ${vectorLen}${
+                          isVectorType(typeSelect) &&
+                          !isBitVectorType(typeSelect)
+                            ? `, elementType: Uint${
+                                8 *
+                                (elementType as UintType<unknown>).byteLength
+                              }`
+                            : ``
+                        }>`
+                      : isListType(typeSelect)
+                      ? `<limit: ${listLimit}${
+                          !isBitListType(typeSelect)
+                            ? `, elementType: Uint${
+                                (elementType as UintType<unknown>).byteLength *
+                                8
+                              }`
+                            : ``
+                        }>`
+                      : ``
+                  }`}
+                />
               </div>
               <div className="row">
+                {isVectorType(typeSelect) && (
+                  <SetLength
+                    setVectorLen={setVectorLen}
+                    currentLen={vectorLen}
+                  />
+                )}
+                {/* {isListType(typeSelect) && <>Set Limit: {listLimit}</>} */}
+                {isListType(typeSelect) && (
+                  <SetLimit
+                    perChunk={
+                      isUintType(typeSelect.elementType)
+                        ? 32 /
+                          (typeSelect.elementType as UintType<unknown>)
+                            .byteLength
+                        : 256
+                    }
+                    setLimit={setListLimit}
+                    curLimit={listLimit}
+                  />
+                )}
                 <div className="col border">
-                  <text>options</text>
-                </div>
-                <div className="col border">
-                  <text>options</text>
+                  {(isVectorType(typeSelect) || isListType(typeSelect)) &&
+                    !isBitVectorType(typeSelect) &&
+                    !isBitListType(typeSelect) && (
+                      <SetElementType setEType={setEType} />
+                    )}
                 </div>
               </div>
             </div>
@@ -138,19 +251,12 @@ export default function Serialize(props: SerializeProps) {
             </div>
           </div>
           <div className="row w-100">
-            {
-              <OutputBox
-                data={values}
-                type={typeSelect}
-                mode={inputMode}
-                setProofNode={setProofNode}
-              />
-            }
+            {showInfo}
           </div>
         </div>
-        <div className="col-5 h-100 overflow-auto">
-          {isCompositeType(typeSelect) && <Tree type={typeSelect} p={proofNode} />}
-        </div>
+        {/* <div className="col-5 h-100 overflow-auto">
+          <VisualColumn type={typeSelect} proofNode={proofNode} data={values} />
+        </div> */}
       </div>
     </div>
   );
