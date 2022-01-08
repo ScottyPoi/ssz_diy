@@ -23,6 +23,8 @@ import {
   isBooleanType,
   BitVector,
   BitList,
+  UnionType,
+  isUnionType,
 } from "@chainsafe/ssz";
 import { randBasic, randList, randVector } from "./randUint";
 import SelectType from "./SelectType";
@@ -31,12 +33,17 @@ import SetLength from "./setLength";
 import SetElementType from "./SetElementType";
 import { SetLimit } from "./SetLimit";
 import RandomData from "../RandomData";
+import { types } from "util";
+import Union from './Union'
 
 interface SerializeProps {
   userTypes: string[];
 }
 
 export default function Serialize(props: SerializeProps) {
+
+  const [unionTypes, setUnionTypes] = useState<Type<any>[]>([new BigIntUintType({byteLength: 32})])
+  const [unionTypeNames, setUnionTypeNames] = useState<string[]>(["Uint256"])
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [inputMode, setInputMode] = useState<number>(0);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -111,6 +118,8 @@ export default function Serialize(props: SerializeProps) {
           ? new BitListType({ limit: listLimit })
           : _type === "List"
           ? new BasicListType({ limit: listLimit, elementType: elementType })
+          : _type === "Union"
+          ? new UnionType({types: unionTypes})
           : new BooleanType();
       // if (isBasicType(t)) {
       //   setValues(randBasic(t));
@@ -214,7 +223,9 @@ export default function Serialize(props: SerializeProps) {
                               }`
                             : ``
                         }>`
-                      : ``
+                      : isUnionType(typeSelect)
+                      ? `<types: [${unionTypeNames}]>`
+                        : ``
                   }`}
                 />
               </div>
@@ -238,6 +249,9 @@ export default function Serialize(props: SerializeProps) {
                     setLimit={setListLimit}
                     curLimit={listLimit}
                   />
+                )}
+                {isUnionType(typeSelect) &&  (
+                  <Union setUnion={setTypeSelect} setUnionTypes={setUnionTypes} setTypeNames={setUnionTypeNames}/>
                 )}
                 <div className="col border">
                   {(isVectorType(typeSelect) || isListType(typeSelect)) &&
