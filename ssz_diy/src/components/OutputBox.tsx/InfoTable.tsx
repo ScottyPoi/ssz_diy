@@ -4,15 +4,20 @@ import {
   isBitListType,
   isCompositeType,
   isListType,
+  isUintType,
+  isUnionType,
   isVectorType,
+  NumberUintType,
   toHexString,
   Type,
+  UnionType,
 } from "@chainsafe/ssz";
 import { Text } from "@chakra-ui/react";
+import { UnionObject } from "../../RandomData";
 
 interface InfoTableProps {
   type: Type<any>;
-  data: number | unknown[] | bigint | boolean;
+  data: number | bigint | boolean | unknown[] | UnionObject;
   // setProofNode: Function;
 }
 
@@ -123,12 +128,37 @@ export default function InfoTable(props: InfoTableProps) {
                 </tr>
               )}
               <tr>
-                <th scope="row">HashTreeRoot<br/>(G-Index 1)</th>
+                <th scope="row">
+                  HashTreeRoot
+                  <br />
+                  (G-Index 1)
+                </th>
                 <td className="text-break">{toHexString(hashTreeRoot)}</td>
               </tr>
-              {((isListType(props.type)) || isVectorType(props.type)) && props.type.struct_getChunkCount(deserialized) > 1 && (
+              {(isListType(props.type) || isVectorType(props.type)) &&
+                props.type.struct_getChunkCount(deserialized) > 1 && (
+                  <tr>
+                    <th scope="row">
+                      Merkle Root
+                      <br />
+                      (G-Index 2)
+                    </th>
+                    <td className="text-break">
+                      {toHexString(
+                        props.type
+                          .struct_convertToTree(deserialized)
+                          .getRoot(BigInt(2))
+                      )}
+                    </td>
+                  </tr>
+                )}
+              {isUnionType(props.type) && (
                 <tr>
-                  <th scope="row">Merkle Root<br/>(G-Index 2)</th>
+                  <th scope="row">
+                    Merkle Root of Value
+                    <br />
+                    (G-Index 2)
+                  </th>
                   <td className="text-break">
                     {toHexString(
                       props.type
@@ -138,9 +168,19 @@ export default function InfoTable(props: InfoTableProps) {
                   </td>
                 </tr>
               )}
-              {(isVectorType(props.type) || isListType(props.type)) && props.type.struct_getChunkCount(deserialized) > 1 && (
+              {isUnionType(props.type) && (
                 <tr>
-                  <th scope="row">Length<br/>(G-Index 3)</th>
+                  <th scope="row">
+                    Selector: type[
+                    {new NumberUintType({ byteLength: 32 }).deserialize(
+                      props.type
+                        .struct_convertToTree(deserialized)
+                        .getRoot(BigInt(3))
+                    )}
+                    ]
+                    <br />
+                    (G-Index 3)
+                  </th>
                   <td className="text-break">
                     {toHexString(
                       props.type
@@ -150,23 +190,66 @@ export default function InfoTable(props: InfoTableProps) {
                   </td>
                 </tr>
               )}
-              {isCompositeType(props.type) ? (
-                <>{props.type.struct_getChunkCount(deserialized) > 1 && (
+              {(isVectorType(props.type) || isListType(props.type)) &&
+                props.type.struct_getChunkCount(deserialized) > 1 && (
                   <tr>
-                    <th scope="row">Merkle Proof by Leaf:</th>
-                    <td colSpan={2}>
-                      <table className="table">
-                        <tbody>{showTree()}</tbody>
-                      </table>
+                    <th scope="row">
+                      Length
+                      <br />
+                      (G-Index 3)
+                    </th>
+                    <td className="text-break">
+                      {toHexString(
+                        props.type
+                          .struct_convertToTree(deserialized)
+                          .getRoot(BigInt(3))
+                      )}
                     </td>
                   </tr>
-                ) }
+                )}
+              {isCompositeType(props.type) ? (
+                <>
+                  {props.type.struct_getChunkCount(deserialized) > 1 && (
+                    <tr>
+                      <th scope="row">Merkle Proof by Leaf:</th>
+                      <td colSpan={2}>
+                        <table className="table">
+                          <tbody>{showTree()}</tbody>
+                        </table>
+                      </td>
+                    </tr>
+                  )}
                   <tr>
-                    <th scope="row">Values<br/>({(data as unknown[]).length})</th>
+                    <th scope="row">
+                      Values
+                      {isUnionType(props.type) && (
+                        <>
+                          <br />
+                          {`{`}selector:{" "}
+                          {(deserialized as UnionObject).selector}
+                          {`}`}
+                        </>
+                      )}
+                      <br />({(data as unknown[]).length})
+                    </th>
                     <td>
-                      <div className="text-break overflow-auto">
+                      {isUnionType(props.type) ? (
+                        <div className="text-break overflow-auto">
+                          <InfoTable
+                            type={
+                              props.type.types[
+                                (deserialized as UnionObject).selector
+                              ]
+                            }
+                            data={(deserialized as UnionObject).value}
+                          />
+                        </div>
+                      ) : (
+
+                        <div className="text-break overflow-auto">
                         [{data.toString()}]
                       </div>
+                        )}
                     </td>
                   </tr>
                 </>

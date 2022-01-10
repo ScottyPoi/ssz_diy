@@ -27,36 +27,48 @@ export default function SetElementType(props: SetElementTypeProps) {
 
   useEffect(() => {
     setNewType(types[value]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
   useEffect(() => {
-    setEType(newType);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newType]);
 
-
   const cmenu = (
-    <select defaultValue={"Change Element Type"} onChange={(e) => setValue(e.target.value)} className='form-select' aria-label='set element type'>
-      <option disabled>Change Element Type</option>
+    <select
+      defaultValue={value}
+      size={1}
+      onChange={(e) => setValue(e.target.value)}
+      className="form-select"
+      aria-label="set element type"
+    >
+      <option disabled>Select Element Type</option>
       {Object.keys(types).map((k, i) => {
-          return (
-            <option value={k} key={k}>{k}
-              {/* <button
+        return (
+          <option value={k} key={k}>
+            {k}
+            {/* <button
                 onClick={() => setValue(k.toString())}
                 className="dropdown-item"
                 type="button"
               >
                 {k}
               </button> */}
-            </option>
-          );
-        })}
+          </option>
+        );
+      })}
     </select>
-  )
+  );
 
-  
-
-  
-
-  return cmenu;
+  return (
+    <div className="d-grid gap-2">
+      {cmenu}
+      <button
+        type="button"
+        className="btn btn-primary btn-sm"
+        onClick={() => setEType(newType)}
+      >
+        Set Element Type
+      </button>
+    </div>
+  );
 }

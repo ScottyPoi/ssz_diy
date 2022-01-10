@@ -25,6 +25,7 @@ import {
   BitList,
   UnionType,
   isUnionType,
+  isContainerType,
 } from "@chainsafe/ssz";
 import { randBasic, randList, randVector } from "./randUint";
 import SelectType from "./SelectType";
@@ -32,18 +33,20 @@ import InfoTable from "./OutputBox.tsx/InfoTable";
 import SetLength from "./setLength";
 import SetElementType from "./SetElementType";
 import { SetLimit } from "./SetLimit";
-import RandomData from "../RandomData";
+import RandomData, { UnionObject } from "../RandomData";
 import { types } from "util";
-import Union from './Union'
+import Union from "./Union";
+import Container from "./Container";
 
 interface SerializeProps {
   userTypes: string[];
 }
 
 export default function Serialize(props: SerializeProps) {
-
-  const [unionTypes, setUnionTypes] = useState<Type<any>[]>([new BigIntUintType({byteLength: 32})])
-  const [unionTypeNames, setUnionTypeNames] = useState<string[]>(["Uint256"])
+  const [unionTypes, setUnionTypes] = useState<Type<any>[]>([
+    new BigIntUintType({ byteLength: 32 }),
+  ]);
+  const [unionTypeNames, setUnionTypeNames] = useState<string[]>(["Uint256"]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [inputMode, setInputMode] = useState<number>(0);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -58,12 +61,13 @@ export default function Serialize(props: SerializeProps) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showInfo, setShowInfo] = useState(<></>);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [typeSelect, setTypeSelect] = useState<
-    BasicType<any> | CompositeType<any>
-  >(new BooleanType());
-  const [values, setValues] = useState<number | boolean | bigint | unknown[]>(
-    0
+  const [typeSelect, setTypeSelect] = useState<Type<unknown>>(
+    new BooleanType()
   );
+
+  const [values, setValues] = useState<
+    number | bigint | boolean | unknown[] | UnionObject
+  >(0);
 
   async function getTypeSelect() {
     return typeSelect;
@@ -97,7 +101,7 @@ export default function Serialize(props: SerializeProps) {
   }, [typeSelect]);
   useEffect(() => {
     getTypeName().then((_type) => {
-      setShowInfo(<></>)
+      setShowInfo(<></>);
       const t =
         _type === "Boolean"
           ? new BooleanType()
@@ -119,30 +123,12 @@ export default function Serialize(props: SerializeProps) {
           : _type === "List"
           ? new BasicListType({ limit: listLimit, elementType: elementType })
           : _type === "Union"
-          ? new UnionType({types: unionTypes})
+          ? new UnionType({ types: unionTypes })
           : new BooleanType();
-      // if (isBasicType(t)) {
-      //   setValues(randBasic(t));
-      // } else if (isCompositeType(t)) {
-      //   if (isVectorType(t)) {
-      //     const data = randVector(t);
-      //     const vals = isBitVectorType(t)
-      //       ? t.tree_iterateValues(t.struct_convertToTree(data as BitVector))
-      //       : t.tree_iterateValues(t.struct_convertToTree(data));
-      //     setValues(Array.from(vals));
-      //   } else if (isListType(t)) {
-      //     const data = randList(t);
-      //     const vals = isBitListType(t)
-      //       ? t.tree_iterateValues(t.struct_convertToTree(data as BitList))
-      //       : t.tree_iterateValues(t.struct_convertToTree(data));
-
-      //     setValues(Array.from(vals));
-      //   }
-      // }
       setTypeSelect(t);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [typeName, listLimit, vectorLen, elementType]);
+  }, [typeName, listLimit, vectorLen, elementType, unionTypes]);
 
   //     useEffect(() => {
   //       function lenPrompt() {
@@ -162,117 +148,120 @@ export default function Serialize(props: SerializeProps) {
       "Uint256",
     ],
 
-    Array: [
-      "BitVector",
-      "BitList",
-      "Vector",
-      "List",
-    ],
+    Array: ["BitVector", "BitList", "Vector", "List"],
     Container: ["Container"],
     Union: ["Union"],
     Custom: [...props.userTypes],
   };
 
-
   async function makeInfo() {
-    const t = await getTypeSelect()
-    RandomData({t, setValues}).then((values) => {
-      setValues(values)
+    const t = await getTypeSelect();
+    RandomData({ t, setValues }).then((values) => {
+      setValues(values);
       setShowInfo(<InfoTable data={values} type={typeSelect} />);
-    })
+    });
   }
 
   return (
     <div className="container m-0 p-0 vw-100 vh-100">
-      <div className=" justify-content-center row w-50">
-        <div className="col-4">
-          {/* <VectorPrompt onOpen={onOpen} onClose={onClose} isOpen={isOpen} vectorLen={vectorLen} setVectorLen={setVectorLen} /> */}
-        </div>
-      </div>
       <div className="row m-0 p-0 vh-100 vw-100">
         <SelectType
           set_Type={setTypeName}
           _type={typeName}
           nativeTypes={nativeTypes}
         />
-        <div className="col w-90 h-100 border">
+        <div className="col">
           <div className="row">
-            <div className="col">
-              <div className="row">Type</div>
-              <div className="row">
-                <input
-                  readOnly
-                  type="text"
-                  value={`${typeName}${
-                    isVectorType(typeSelect)
-                      ? `<length: ${vectorLen}${
-                          isVectorType(typeSelect) &&
-                          !isBitVectorType(typeSelect)
-                            ? `, elementType: Uint${
-                                8 *
-                                (elementType as UintType<unknown>).byteLength
-                              }`
-                            : ``
-                        }>`
-                      : isListType(typeSelect)
-                      ? `<limit: ${listLimit}${
-                          !isBitListType(typeSelect)
-                            ? `, elementType: Uint${
-                                (elementType as UintType<unknown>).byteLength *
-                                8
-                              }`
-                            : ``
-                        }>`
-                      : isUnionType(typeSelect)
-                      ? `<types: [${unionTypeNames}]>`
+          {/* <div className="col-1">
+            <h4>Type</h4>
+            </div> */}
+          <div className="col-9">
+            <textarea
+            className="form-control m-2"
+            style={{fontSize: '1rem'}}
+              readOnly
+              rows={2}
+              value={`${typeName}${
+                isVectorType(typeSelect)
+                  ? `<length: ${vectorLen}${
+                      isVectorType(typeSelect) && !isBitVectorType(typeSelect)
+                        ? `, elementType: Uint${
+                            8 * (elementType as UintType<unknown>).byteLength
+                          }`
                         : ``
-                  }`}
+                    }>`
+                  : isListType(typeSelect)
+                  ? `<limit: ${listLimit}${
+                      !isBitListType(typeSelect)
+                        ? `, elementType: Uint${
+                            (elementType as UintType<unknown>).byteLength * 8
+                          }`
+                        : ``
+                    }>`
+                  : isUnionType(typeSelect)
+                  ? `<types: [${unionTypeNames}]>`
+                  : ``
+              }`}
+            />
+          </div>
+          <div className="col-3">
+                      {<InputBox makeInfo={makeInfo} />}
+                    </div>
+          </div>
+          {isContainerType(typeSelect) && <Container />}
+          {typeName === 'Container' && <Container />}
+          <div className="row">
+            {" "}
+            {isVectorType(typeSelect) && (
+              <div className="col align-items-end">
+                <SetLength setVectorLen={setVectorLen} currentLen={vectorLen} />
+              </div>
+            )}
+            {/* {isListType(typeSelect) && <>Set Limit: {listLimit}</>} */}
+            {isListType(typeSelect) && (
+              <div className="col align-items-end">
+                <SetLimit
+                  perChunk={
+                    isUintType(typeSelect.elementType)
+                      ? 32 /
+                        (typeSelect.elementType as UintType<unknown>).byteLength
+                      : 256
+                  }
+                  setLimit={setListLimit}
+                  curLimit={listLimit}
                 />
               </div>
-              <div className="row">
-                {isVectorType(typeSelect) && (
-                  <SetLength
-                    setVectorLen={setVectorLen}
-                    currentLen={vectorLen}
-                  />
-                )}
-                {/* {isListType(typeSelect) && <>Set Limit: {listLimit}</>} */}
-                {isListType(typeSelect) && (
-                  <SetLimit
-                    perChunk={
-                      isUintType(typeSelect.elementType)
-                        ? 32 /
-                          (typeSelect.elementType as UintType<unknown>)
-                            .byteLength
-                        : 256
-                    }
-                    setLimit={setListLimit}
-                    curLimit={listLimit}
-                  />
-                )}
-                {isUnionType(typeSelect) &&  (
-                  <Union setUnion={setTypeSelect} setUnionTypes={setUnionTypes} setTypeNames={setUnionTypeNames}/>
-                )}
-                <div className="col border">
-                  {(isVectorType(typeSelect) || isListType(typeSelect)) &&
-                    !isBitVectorType(typeSelect) &&
-                    !isBitListType(typeSelect) && (
-                      <SetElementType setEType={setEType} />
-                    )}
-                </div>
+            )}{" "}
+            {isUnionType(typeSelect) && (
+              <div className="col">
+                <Union
+                  setUnion={setTypeSelect}
+                  setUnionTypes={setUnionTypes}
+                  setTypeNames={setUnionTypeNames}
+                />
               </div>
-            </div>
+            )}
+            {(isVectorType(typeSelect) || isListType(typeSelect)) &&
+              !isBitVectorType(typeSelect) &&
+              !isBitListType(typeSelect) && (
+                <div className="col">
+                  <SetElementType setEType={setEType} />
+                </div>
+              )}
+          </div>
+          <div className="row">
             <div className="col">
-              {<InputBox makeInfo={makeInfo}/>}
+              <div className="row">
+                <div className="row">
+                  <div className="col">
+
+                  </div>
+                </div>
+              </div>{" "}
             </div>
           </div>
-          <div className="row w-100">
-            {showInfo}
-          </div>
+          <div className="row w-100">{showInfo}</div>
         </div>
-        {/* <div className="col-5 h-100 overflow-auto">
-          <VisualColumn type={typeSelect} proofNode={proofNode} data={values} />
-        </div> */}
       </div>
     </div>
   );

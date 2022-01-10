@@ -20,7 +20,7 @@ export default function SelectType(props: SelectTypeProps) {
     >
       <div className="row">
         <h5 className="text-center">Select Type</h5>
-        <CreateType />
+        {/* <CreateType /> */}
 
         <select
           onChange={(e) => props.set_Type(e.target.value)}
@@ -30,7 +30,7 @@ export default function SelectType(props: SelectTypeProps) {
             scrollbarWidth: "none",
             border: "none",
           }}
-          className="form-select form-select-sm"
+          className="form-select form-select-md"
           size={
             13
           }
