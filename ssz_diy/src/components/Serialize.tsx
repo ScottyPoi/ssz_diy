@@ -26,8 +26,9 @@ import {
   UnionType,
   isUnionType,
   isContainerType,
+  ContainerType,
 } from "@chainsafe/ssz";
-import { randBasic, randList, randVector } from "./randUint";
+import { randBasic, randList, randomDataSet, randVector } from "./randUint";
 import SelectType from "./SelectType";
 import InfoTable from "./OutputBox.tsx/InfoTable";
 import SetLength from "./setLength";
@@ -46,6 +47,9 @@ export default function Serialize(props: SerializeProps) {
   const [unionTypes, setUnionTypes] = useState<Type<any>[]>([
     new BigIntUintType({ byteLength: 32 }),
   ]);
+  const [containerTypes, setContainerTypes] = useState<
+    Record<string, Type<any>>
+  >({ "exampleKey": new BigIntUintType({ byteLength: 32 }) });
   const [unionTypeNames, setUnionTypeNames] = useState<string[]>(["Uint256"]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [inputMode, setInputMode] = useState<number>(0);
@@ -124,11 +128,13 @@ export default function Serialize(props: SerializeProps) {
           ? new BasicListType({ limit: listLimit, elementType: elementType })
           : _type === "Union"
           ? new UnionType({ types: unionTypes })
+          : _type === "Container"
+          ? new ContainerType({ fields: containerTypes })
           : new BooleanType();
       setTypeSelect(t);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [typeName, listLimit, vectorLen, elementType, unionTypes]);
+  }, [typeName, listLimit, vectorLen, elementType, unionTypes, containerTypes]);
 
   //     useEffect(() => {
   //       function lenPrompt() {
@@ -156,10 +162,14 @@ export default function Serialize(props: SerializeProps) {
 
   async function makeInfo() {
     const t = await getTypeSelect();
-    RandomData({ t, setValues }).then((values) => {
-      setValues(values);
-      setShowInfo(<InfoTable data={values} type={typeSelect} />);
-    });
+    const dataSet = randomDataSet(t)
+    setValues(dataSet)
+    setShowInfo(<InfoTable data={dataSet} type={t} />);
+
+    // RandomData({ t, setValues }).then((values) => {
+    //   setValues(values);
+    //   setShowInfo(<InfoTable data={values} type={typeSelect} />);
+    // });
   }
 
   return (
@@ -172,44 +182,43 @@ export default function Serialize(props: SerializeProps) {
         />
         <div className="col">
           <div className="row">
-          {/* <div className="col-1">
+            {/* <div className="col-1">
             <h4>Type</h4>
             </div> */}
-          <div className="col-9">
-            <textarea
-            className="form-control m-2"
-            style={{fontSize: '1rem'}}
-              readOnly
-              rows={2}
-              value={`${typeName}${
-                isVectorType(typeSelect)
-                  ? `<length: ${vectorLen}${
-                      isVectorType(typeSelect) && !isBitVectorType(typeSelect)
-                        ? `, elementType: Uint${
-                            8 * (elementType as UintType<unknown>).byteLength
-                          }`
-                        : ``
-                    }>`
-                  : isListType(typeSelect)
-                  ? `<limit: ${listLimit}${
-                      !isBitListType(typeSelect)
-                        ? `, elementType: Uint${
-                            (elementType as UintType<unknown>).byteLength * 8
-                          }`
-                        : ``
-                    }>`
-                  : isUnionType(typeSelect)
-                  ? `<types: [${unionTypeNames}]>`
-                  : ``
-              }`}
-            />
+            <div className="col-9">
+              <textarea
+                className="form-control m-2"
+                style={{ fontSize: "1rem" }}
+                readOnly
+                rows={2}
+                value={`${typeName}${
+                  isVectorType(typeSelect)
+                    ? `<length: ${vectorLen}${
+                        isVectorType(typeSelect) && !isBitVectorType(typeSelect)
+                          ? `, elementType: Uint${
+                              8 * (elementType as UintType<unknown>).byteLength
+                            }`
+                          : ``
+                      }>`
+                    : isListType(typeSelect)
+                    ? `<limit: ${listLimit}${
+                        !isBitListType(typeSelect)
+                          ? `, elementType: Uint${
+                              (elementType as UintType<unknown>).byteLength * 8
+                            }`
+                          : ``
+                      }>`
+                    : isUnionType(typeSelect)
+                    ? `<types: [${unionTypeNames}]>`
+                    : ``
+                }`}
+              />
+            </div>
+            <div className="col-3">{<InputBox makeInfo={makeInfo} />}</div>
           </div>
-          <div className="col-3">
-                      {<InputBox makeInfo={makeInfo} />}
-                    </div>
-          </div>
-          {isContainerType(typeSelect) && <Container />}
-          {typeName === 'Container' && <Container />}
+          {isContainerType(typeSelect) && (
+            <Container setContainerTypes={setContainerTypes} />
+          )}
           <div className="row">
             {" "}
             {isVectorType(typeSelect) && (
@@ -253,9 +262,7 @@ export default function Serialize(props: SerializeProps) {
             <div className="col">
               <div className="row">
                 <div className="row">
-                  <div className="col">
-
-                  </div>
+                  <div className="col"></div>
                 </div>
               </div>{" "}
             </div>

@@ -25,6 +25,25 @@ interface UnionProps {
   setTypeNames: Dispatch<SetStateAction<string[]>>;
 }
 
+export function nameString(type: Type<any>): string {
+  if (isBooleanType(type)) {
+    return "boolean";
+  } else if (isUintType(type)) {
+    return `Uint${type.byteLength * 8}`;
+  } else if (isBitVectorType(type)) {
+    return `BitVector<length: ${type.length}>`;
+  } else if (isBitListType(type)) {
+    return `BitList<limit: ${type.limit}>`;
+  } else if (isVectorType(type)) {
+    return `Vector<elementType: ${nameString(type.elementType)}, length: ${
+      type.length
+    }>`;
+  } else if (isListType(type)) {
+    return `List<elementType: ${nameString(type.elementType)}, limit: ${
+      type.limit
+    }>`;
+  } else return "null";
+}
 export default function Union(props: UnionProps) {
   const [length, setLength] = useState(1);
   const [limit, setLimit] = useState(256);
@@ -66,25 +85,6 @@ export default function Union(props: UnionProps) {
     }
   }
 
-  function nameString(type: Type<any>): string {
-    if (isBooleanType(type)) {
-      return "boolean";
-    } else if (isUintType(type)) {
-      return `Uint${type.byteLength * 8}`;
-    } else if (isBitVectorType(type)) {
-      return `BitVector<length: ${type.length}>`;
-    } else if (isBitListType(type)) {
-      return `BitList<limit: ${type.limit}>`;
-    } else if (isVectorType(type)) {
-      return `Vector<elementType: ${nameString(type.elementType)}, length: ${
-        type.length
-      }>`;
-    } else if (isListType(type)) {
-      return `List<elementType: ${nameString(type.elementType)}, limit: ${
-        type.limit
-      }>`;
-    } else return "null";
-  }
 
   function removeType(idx: number) {
     let beg = types.slice(0, idx);

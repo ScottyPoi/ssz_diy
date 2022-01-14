@@ -3,6 +3,7 @@ import {
   isBasicType,
   isBitListType,
   isCompositeType,
+  isContainerType,
   isListType,
   isUintType,
   isUnionType,
@@ -14,10 +15,11 @@ import {
 } from "@chainsafe/ssz";
 import { Text } from "@chakra-ui/react";
 import { UnionObject } from "../../RandomData";
+import { dataSet } from "../randUint";
 
 interface InfoTableProps {
   type: Type<any>;
-  data: number | bigint | boolean | unknown[] | UnionObject;
+  data: dataSet;
   // setProofNode: Function;
 }
 
@@ -244,12 +246,22 @@ export default function InfoTable(props: InfoTableProps) {
                             data={(deserialized as UnionObject).value}
                           />
                         </div>
+                      ) : isContainerType(props.type) ? (
+                        Object.entries(props.type.fields).map(
+                          ([key, type], idx) => {
+                            return (
+                              <div key={key} className="text-break overflow-auto">
+                                {key}:{" "}
+                                <InfoTable type={type} data={props.data[key]} />
+                              </div>
+                            );
+                          }
+                        )
                       ) : (
-
                         <div className="text-break overflow-auto">
-                        [{data.toString()}]
-                      </div>
-                        )}
+                          [{data.toString()}]
+                        </div>
+                      )}
                     </td>
                   </tr>
                 </>

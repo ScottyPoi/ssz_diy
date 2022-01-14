@@ -1,52 +1,108 @@
-import { BasicListType, BasicType, BasicVectorType, BitListType, BitVectorType, isBasicType, isBigIntUintType, isBooleanType, isListType, isNumberUintType, isVectorType, List, ListType, UintType, Union, UnionType, Vector } from "@chainsafe/ssz";
- export default function hey() {} 
-export   function randBasic(type: BasicType<any>): number | bigint | boolean {
-  let numType = type as UintType<any>
-  let byteLength = numType.byteLength * 8
-  let num =
-    isBooleanType(type)
-      ? Math.random() > 0.5
-      : isNumberUintType(type) 
-      ? Math.abs(Math.floor(2 ** byteLength * Math.random() - 1))
-      : isBigIntUintType(type)
-      ? BigInt(Math.abs(Math.floor(2 ** byteLength * Math.random() - 1)))
-      : 0
-      return num
+import {
+  BasicListType,
+  BasicType,
+  BasicVectorType,
+  BitListType,
+  BitVectorType,
+  ContainerType,
+  isBasicType,
+  isBigIntUintType,
+  isBooleanType,
+  isContainerType,
+  isListType,
+  isNumberUintType,
+  isUnionType,
+  isVectorType,
+  List,
+  ListType,
+  Type,
+  UintType,
+  Union,
+  UnionType,
+  Vector,
+  VectorType,
+} from "@chainsafe/ssz";
+export default function hey() {}
+export function randBasic(type: BasicType<any>): basicData {
+  let numType = type as UintType<any>;
+  let byteLength = numType.byteLength * 8;
+  let num = isBooleanType(type)
+    ? Math.random() > 0.5
+    : isNumberUintType(type)
+    ? Math.abs(Math.floor(2 ** byteLength * Math.random() - 1))
+    : isBigIntUintType(type)
+    ? BigInt(Math.abs(Math.floor(2 ** byteLength * Math.random() - 1)))
+    : 0;
+  return num;
 }
 
-export function randVector(type: BasicVectorType<Vector<unknown>> | BitVectorType) {
+export function randVector(type: VectorType<any> | BitVectorType): arrayData {
   let length = type.length;
-  let elementType = type.elementType
+  let elementType = type.elementType;
   let array = [];
   for (let i = 0; i < length; i++) {
-    array.push(randBasic(elementType));
+    let rand = randomDataSet(elementType);
+    array.push(rand);
   }
-  return array
+  return array;
 }
 
-export function randList(type: BasicListType<List<unknown>> | BitListType) {
-    let limit = type.limit;
-    let length = Math.ceil(Math.random() * limit);
-    let elementType = type.elementType;
-    let array = [];
+export function randList(type: ListType<any> | BitListType): arrayData {
+  let limit = type.limit;
+  let length = Math.ceil(Math.random() * limit);
+  let elementType = type.elementType;
+  let array = [];
   for (let i = 0; i < length; i++) {
-    array.push(randBasic(elementType));
+    array.push(randomDataSet(elementType));
   }
-  return array
+  return array;
 }
 
-export function randUnion(type: UnionType<Union<unknown>>) {
-  const types = type.types
+export function randUnion(type: UnionType<any>): unionData {
+  const types = type.types;
   // const randIdx = Math.floor(Math.random() * types.length)
-  const randIdx = 0
-  const randType = types[randIdx]
-  const randData = isBasicType(randType) 
-  ? randBasic(randType)
-  : isListType(randType)
-  ? randList(randType as BasicListType<List<unknown>>)
-  : isVectorType(randType)
-  ? randVector(randType as BasicVectorType<Vector<unknown>>)
-  : randType.defaultValue()
-  const union = {selector: randIdx, value: randData}
-  return union
+  const randIdx = 0;
+  const randType = types[randIdx];
+  const randData = randomDataSet(randType);
+  const union = { selector: randIdx, value: randData };
+  return union;
+}
+
+export function randContainer(container: ContainerType<any>) {
+  const fields = container.fields;
+  const data = Object.entries(fields).map(([key, type]) => {
+    return [key, randomDataSet(type)];
+  });
+  const dataObj: Record<string, dataSet> = Object.fromEntries(data);
+  return dataObj;
+}
+
+type basicData = boolean | bigint | number;
+// @ts-ignore
+type compositeData = arrayData | containerData | unionData;
+type basicArrayData = basicData[];
+type compositeArrayData =
+  | compositeData[]
+  | compositeArrayData[]
+  | basicArrayData[];
+type arrayData = basicArrayData | compositeArrayData | arrayData[];
+// @ts-ignore
+type containerData = Record<string, dataSet>;
+type unionData = { selector: number; value: dataSet };
+// @ts-ignore
+export type dataSet = basicData | compositeData;
+
+export function randomDataSet(type: Type<any>): dataSet {
+  const data: dataSet = isBasicType(type)
+    ? randBasic(type)
+    : isVectorType(type)
+    ? randVector(type)
+    : isListType(type)
+    ? randList(type)
+    : isUnionType(type)
+    ? randUnion(type)
+    : isContainerType(type)
+    ? randContainer(type)
+    : type.defaultValue();
+  return data;
 }
