@@ -1,11 +1,8 @@
 import {
-  BasicType,
   BigIntUintType,
-  CompositeType,
   isBitListType,
   isBitVectorType,
   isBooleanType,
-  isCompositeType,
   isListType,
   isUintType,
   isVectorType,
@@ -14,10 +11,10 @@ import {
   UnionType,
 } from "@chainsafe/ssz";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import SetContainerField from "./setContainerField";
 import SetElementType from "./SetElementType";
 import SetLength from "./setLength";
 import { SetLimit } from "./SetLimit";
-import SetUnionType from "./setUnionType";
 
 interface UnionProps {
   setUnion: Dispatch<SetStateAction<Type<unknown>>>;
@@ -73,6 +70,7 @@ export default function Union(props: UnionProps) {
       );
       props.setUnion(new UnionType({ types: t }));
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [types]);
 
   function addType(type: Type<unknown>, idx?: number) {
@@ -96,9 +94,9 @@ export default function Union(props: UnionProps) {
     <div className="container">
       <div className="row m-1">
         <div id="Set Type" className="col-4 m-3">
-          <SetUnionType
-            selected={selected}
-            setSelected={setSelected}
+          <SetContainerField
+            newField={selected}
+            setNewField={setSelected}
             length={length}
             limit={limit}
             elementType={elementType}

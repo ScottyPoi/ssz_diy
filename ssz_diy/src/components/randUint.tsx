@@ -1,7 +1,5 @@
 import {
-  BasicListType,
   BasicType,
-  BasicVectorType,
   BitListType,
   BitVectorType,
   ContainerType,
@@ -13,13 +11,10 @@ import {
   isNumberUintType,
   isUnionType,
   isVectorType,
-  List,
   ListType,
   Type,
   UintType,
-  Union,
   UnionType,
-  Vector,
   VectorType,
 } from "@chainsafe/ssz";
 export default function hey() {}

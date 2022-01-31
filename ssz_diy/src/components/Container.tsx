@@ -4,17 +4,17 @@ import {
   ContainerType,
   isBitListType,
   isBitVectorType,
+  isCompositeType,
   isListType,
   isVectorType,
+  Number64UintType,
   NumberUintType,
   Type,
 } from "@chainsafe/ssz";
-import types from "@emotion/styled";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import SetElementType from "./SetElementType";
-import SetLength from "./setLength";
+import SetContainerField from "./setContainerField";
 import { SetLimit } from "./SetLimit";
-import SetUnionType from "./setUnionType";
+import SetOptions from "./SetOptions";
 import { nameString } from "./Union";
 
 interface ContainerProps {
@@ -22,23 +22,25 @@ interface ContainerProps {
 }
 
 export default function Container(props: ContainerProps) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [container, setContainer] = useState(
     new ContainerType({
       fields: { "0": new BigIntUintType({ byteLength: 32 }) },
     })
   );
+  const setContainerTypes = props.setContainerTypes
   const [fields, setFields] = useState<Record<string, Type<any>>>({
     exampleKey: new BigIntUintType({ byteLength: 32 }),
   });
-  const [fieldsMap, setFieldsMap] = useState<Map<string, Type<any>>>(
-    new Map<string, Type<any>>().set(
-      "exampleKey",
-      new BigIntUintType({ byteLength: 32 })
-    )
-  );
-  const [idx, setIdx] = useState<number>(1);
+  // const [fieldsMap, setFieldsMap] = useState<Map<string, Type<any>>>(
+  //   new Map<string, Type<any>>().set(
+  //     "exampleKey",
+  //     new BigIntUintType({ byteLength: 32 })
+  //   )
+  // );
+  // const [idx, setIdx] = useState<number>(1);
   const [idxRemove, setIdxRemove] = useState<number>(0);
-  const [selected, setSelected] = useState<Type<any>>(new BooleanType());
+  const [newField, setNewField] = useState<Type<any>>(new BooleanType());
   const [curKey, setCurKey] = useState<string>("new");
   const [length, setLength] = useState<number>(1);
   const [limit, setLimit] = useState<number>(256);
@@ -46,13 +48,32 @@ export default function Container(props: ContainerProps) {
     new NumberUintType({ byteLength: 1 })
   );
 
-  function addFieldAtIdx(key: string, type: Type<unknown>, idx: number) {
-    let f = Object.entries(fields);
-    let a = idx > 0 ? Array.from(f).slice(0, idx + 1) : [];
-    let b = idx < f.length - 1 ? Array.from(f).slice(idx) : [];
-    let c = [...a, [key, type], ...b];
-    setFields(Object.fromEntries(c));
-  }
+  // const [u_selected, setU_Selected] = useState<Type<any>>(new Number64UintType())
+  // const [u_length, setU_Length] = useState<number>(1);
+  // const [u_limit, setU_Limit] = useState<number>(256);
+  // const [u_elementType, setU_ElementType] = useState<Type<any>>(
+  //   new NumberUintType({ byteLength: 1 })
+  // );
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [c_selected, setC_Selected] = useState<Type<any>>(new Number64UintType())
+  // const [c_length, setC_Length] = useState<number>(1);
+  // const [c_limit, setC_Limit] = useState<number>(256);
+  // const [c_elementType, setC_ElementType] = useState<Type<any>>(
+  //   new NumberUintType({ byteLength: 1 })
+  // );
+
+  
+
+  // function addFieldAtIdx(key: string, type: Type<unknown>, idx: number) {
+  //   let f = Object.entries(fields);
+  //   let a = idx > 0 ? Array.from(f).slice(0, idx + 1) : [];
+  //   let b = idx < f.length - 1 ? Array.from(f).slice(idx) : [];
+  //   let c = [...a, [key, type], ...b];
+  //   setFields(Object.fromEntries(c));
+  // }
+
+
   function removeFieldAtIdx(idx: number) {
     let f = Object.entries(fields);
     let a = idx > 0 ? Array.from(f).slice(0, idx) : [];
@@ -68,23 +89,30 @@ export default function Container(props: ContainerProps) {
     setFields(fo);
   }
 
+
+
+  useEffect(() => {
+  
+  },[length, limit, elementType])
+
   useEffect(() => {
     const con = new ContainerType({ fields: fields });
     setContainer(con);
-    props.setContainerTypes(fields);
+    setContainerTypes(fields);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fields]);
 
-  async function getFields() {
-    return fields;
-  }
+  // async function getFields() {
+  //   return fields;
+  // }
 
   return (
     <div className="container">
       <div className="row m-1">
         <div id="Set Type" className="col-4 m-3">
-          <SetUnionType
-            selected={selected}
-            setSelected={setSelected}
+          <SetContainerField
+            newField={newField}
+            setNewField={setNewField}
             length={length}
             limit={limit}
             elementType={elementType}
@@ -97,36 +125,22 @@ export default function Container(props: ContainerProps) {
           {/* <div role='group' className="btn-group-vertical fluid"> */}
           <div className="container m-2 border">
             <div className="row m-1">
-              <p className="text-center">{nameString(selected)}</p>
+              <p className="text-center">{nameString(newField)}</p>
             </div>
-            {isVectorType(selected) ? (
-              <div className="row my-2">
-                {!isBitVectorType(selected) && (
-                  <div className="col">
-                    <SetElementType setEType={setElementType} />
-                  </div>
-                )}
-                <div className="col">
-                  <SetLength currentLen={length} setVectorLen={setLength} />
-                </div>
-              </div>
-            ) : isListType(selected) ? (
-              <div className="row">
-                <div className="col">
-                  <SetElementType setEType={setElementType} />
-                </div>
+            {<SetOptions 
+            newField={newField}
+            setNewField={setNewField}
+            length={length}
+            limit={limit}
+            elementType={elementType}
+            setLength={setLength}
+            setLimit={setLimit}
+            setElementType={setElementType}
+            />}
 
-                <div className="col">
-                  <SetLimit
-                    curLimit={limit}
-                    perChunk={256}
-                    setLimit={setLimit}
-                  />
-                </div>
-              </div>
-            ) : (
-              <></>
-            )}
+          {isCompositeType(c_selected) && 
+          (<>options</>)
+          }  
           </div>
           <div className="row m-2">
             <div className="col-7 my-2">
@@ -161,7 +175,7 @@ export default function Container(props: ContainerProps) {
                 <button
                   type="button"
                   className="btn btn-sm btn-dark m-1"
-                  onClick={() => addField(curKey, selected)}
+                  onClick={() => addField(curKey, newField)}
                 >
                   +
                 </button>
@@ -175,17 +189,17 @@ export default function Container(props: ContainerProps) {
               </div>
             </div>
             <div className="row p-2">
-              {isBitListType(selected) ? (
+              {isBitListType(newField) ? (
                 <p className="text-center">BitList{`<limit: ${limit}>`}</p>
-              ) : isBitVectorType(selected) ? (
+              ) : isBitVectorType(newField) ? (
                 <p className="text-center">{`BitVector<length: ${length}>`}</p>
-              ) : isVectorType(selected) ? (
+              ) : isVectorType(newField) ? (
                 <>
                   {/* <div className="col">
                     <SetElementType setEType={setElementType} />
                   </div> */}
                 </>
-              ) : isListType(selected) ? (
+              ) : isListType(newField) ? (
                 <>
                   <div className="col">
                     <SetLimit
