@@ -23,7 +23,7 @@ export default function InputBox(props: InputProps) {
   }
 
   return (
-    <div className="btn-group m-1 btn-group-sm">
+    <div className="input-group m-1 input-group-sm">
       <UploadFile type={props.type} typeName={nameString(props.type)} setData={props.setData} setShowInfo={props.setShowInfo} />
       <button
         onClick={async () => await props.makeInfo()}

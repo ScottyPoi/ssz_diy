@@ -117,16 +117,14 @@ export default function InfoTable(props: InfoTableProps) {
 
   return (
     <div style={{ fontSize: "0.8rem" }}>
-      <div className="row justify-content-center">
-        <div className="col-4 p-4">
-          {json && (
-            <div className="text-break overflow-auto">
-              <button type="button" onClick={() => downloadFile(json, "json")}>
-                SAVE DATA TO FILE
-              </button>
-            </div>
-          )}
-        </div>
+      <div className="row my-2 justify-content-start">
+        {json && (
+          <div className="d-grid col-6 text-break overflow-auto">
+            <button type="button" onClick={() => downloadFile(json, "json")}>
+              SAVE DATA AS JSON FILE
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="row justify-content-between border-bottom my-1 mx-4 px-2">
