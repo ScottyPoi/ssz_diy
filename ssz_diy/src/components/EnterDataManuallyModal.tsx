@@ -1,12 +1,13 @@
-import { Type } from "@chainsafe/ssz";
+import { isUnionType, Type } from "@chainsafe/ssz";
 import EnterDataManually from "./EnterDataManually";
-import { Dispatch, SetStateAction, useState } from "react";
-import { randomDataSet } from "./randUint";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 interface EnterDataManuallyModalProps {
   type: Type<any>;
   setData: Dispatch<SetStateAction<unknown>>;
   data: unknown;
+  alias: string | undefined
+  setInfo: (dataSet: unknown) => void
 }
 
 export default function EnterDataManuallyModal(
@@ -14,7 +15,16 @@ export default function EnterDataManuallyModal(
 ) {
   const type = props.type;
   const [inputType, setInputType] = useState<string>("JSON");
-  const [value, setValue] = useState<unknown>(randomDataSet(type));
+  const [value, setValue] = useState<unknown>();
+
+  useEffect(() => {
+    props.setInfo(value)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value])
+
+  if (isUnionType(type) && type.types.length < 1) {
+    return (<></>)
+  } else {
 
   return (
     <div className="modal" id="EnterDataManuallyModal">
@@ -45,6 +55,7 @@ export default function EnterDataManuallyModal(
               type={props.type}
               value={value}
               setValue={setValue}
+              alias={props.alias}
             />
           </div>
           <div className="modal-footer">
@@ -62,5 +73,5 @@ export default function EnterDataManuallyModal(
         </div>
       </div>
     </div>
-  );
+  )};
 }

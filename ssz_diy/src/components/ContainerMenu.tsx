@@ -1,3 +1,4 @@
+import { Type } from "@chainsafe/ssz";
 import { useEffect, useState } from "react";
 import { JsxElement } from "typescript";
 import SelectBasicType from "./SelectBasicType";
@@ -24,6 +25,7 @@ let composites = [
 
 interface ContainerMenuProps {
   setString: Function;
+  aliasList: Record<string, Type<any>>
 }
 
 export default function ContainerMenu(props: ContainerMenuProps) {
@@ -77,18 +79,21 @@ export default function ContainerMenu(props: ContainerMenuProps) {
     const lists: Record<string, JSX.Element> = {
       Basic: (
         <SelectElementType
+        aliasList={props.aliasList}
           types={basics}
           name="Select Basic Type"
           setType={(e: string) => setSelection(e)}
         />),
       Composite: (
-        <SelectElementType
+        <SelectElementType 
+        aliasList={props.aliasList}
           types={composites}
           name="Select Composite Type"
           setType={(e: string) => setSelection(e)}
         />),
       User: (
         <SelectElementType
+        aliasList={props.aliasList}
           types={["User", "List"]}
           name="Select User Type"
           setType={(e: string) => setSelection(e)}

@@ -1,16 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { Type } from "@chainsafe/ssz"
 import { useState } from "react"
 import SelectElementType from "./SelectElementType"
 
-type ListMenuProps = {}
+type UnionMenuProps = {
+    aliasList: Record<string, Type<any>>
+}
 
-export default function UnionMenu(props: ListMenuProps) {
+export default function UnionMenu(props: UnionMenuProps) {
     
     const [curType, setCurType] = useState("")
     
     return (
         <div className='row'>
-            <SelectElementType types={[]} name="Union Types" setType={setCurType} />
+            <SelectElementType aliasList={props.aliasList} types={[]} name="Union Types" setType={setCurType} />
         </div>
     )
 }

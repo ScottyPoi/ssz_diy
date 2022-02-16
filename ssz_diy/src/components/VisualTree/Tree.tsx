@@ -1,9 +1,9 @@
-import { CompositeType, toHexString, Type } from "@chainsafe/ssz";
+import { CompositeType, toHexString } from "@chainsafe/ssz";
 import { useState } from "react";
 
-interface TreeProps {
-  type: Type<unknown>;
-  p: number;
+interface TreeProps<T> {
+  type: CompositeType<T>;
+  value: T
 }
 
 export function bitLength(n: number): number {
@@ -19,14 +19,15 @@ export function nextPowerOf2(n: number): number {
   return n <= 0 ? 1 : Math.pow(2, bitLength(n - 1));
 }
 
-export default function Tree(props: TreeProps) {
+export default function Tree<T>(props: TreeProps<T>) {
   const [leaf, setLeaf] = useState(1);
-  const _type = props.type as CompositeType<Type<unknown>>
-  const data = props.type.defaultValue() as Type<unknown>
+  const _type: CompositeType<T> = props.type
+  // const data: T = props.type.defaultValue()
+  const value: T = props.value
 
-  const proofNode = props.p;
-  const serialized = _type.serialize(data);
-  const hashroot = toHexString(_type.hashTreeRoot(data));
+  const proofNode = 0
+  const serialized = _type.serialize(value);
+  const hashroot = toHexString(_type.hashTreeRoot(value));
   const deserialized = _type.deserialize(serialized);
   const tree = _type.struct_convertToTree(deserialized);
   const values: number[] = Array.from(

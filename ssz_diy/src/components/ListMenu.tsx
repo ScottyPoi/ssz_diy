@@ -6,9 +6,11 @@ import { UintMenu } from "./UintMenu";
 import UnionMenu from "./UnionMenu";
 import SelectBasicType from "./SelectBasicType";
 import BitListMenu from "./BitListMenu";
+import { Type } from "@chainsafe/ssz";
 
 type ListProps = {
   setString: Function;
+  aliasList: Record<string, Type<any>>
 };
 
 export default function ListMenu(props: ListProps) {
@@ -52,7 +54,7 @@ export default function ListMenu(props: ListProps) {
         setUnion(false);
         break;
       case "Vector":
-        setMenu(<VectorMenu setString={setTypeOptions} />);
+        setMenu(<VectorMenu aliasList={props.aliasList} setString={setTypeOptions} />);
         setBoolean(false);
         setUint(false);
         setVector(true);
@@ -72,7 +74,7 @@ export default function ListMenu(props: ListProps) {
         setUnion(false);
         break;
       case "List":
-        setMenu(<ListMenu setString={setTypeOptions} />);
+        setMenu(<ListMenu aliasList={props.aliasList} setString={setTypeOptions} />);
         setBoolean(false);
         setUint(false);
         setVector(false);
@@ -92,7 +94,7 @@ export default function ListMenu(props: ListProps) {
                 setUnion(false);
         break;
       case "Union":
-        setMenu(<UnionMenu />);
+        setMenu(<UnionMenu aliasList={props.aliasList} />);
         setBoolean(false);
         setUint(false);
         setVector(false);

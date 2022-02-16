@@ -1,60 +1,76 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { toHexString } from "@chainsafe/ssz";
+import { toHexString, Type } from "@chainsafe/ssz";
 import { Modal } from "bootstrap";
-import { useState } from "react";
+import {
+  Dispatch,
+  ReactElement,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
+import InfoTable from "./OutputBox.tsx/InfoTable";
 
-export default function UploadFile() {
+interface UploadFileProps {
+  setData: Dispatch<SetStateAction<unknown>>;
+  setShowInfo: Dispatch<SetStateAction<ReactElement>>;
+  type: Type<any>;
+  typeName: string;
+}
 
+export default function UploadFile(props: UploadFileProps) {
+  const [input, setInput] = useState<any>();
+  const asDes = true;
 
-  const [asDes, setAsDes] = useState(true)
-  const [input, setInput] = useState<string>()
+  useEffect(() => {
+    input && props.setData(input);
+    props.setShowInfo(
+      <InfoTable sszTypeName={props.typeName} data={input} type={props.type} />
+    );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [input]);
 
-  function handleClick(): void {
-    const myModal = document.getElementById("FileModal") !== null && new Modal(document.getElementById("FileModal")!, {
-      keyboard: false,
-    });
-    myModal && myModal.show();
-  }
-  
-  function processFileContents(contents: string | ArrayBuffer) {
+  function processFileContents(contents: string) {
     try {
-      if (asDes && contents instanceof ArrayBuffer) {
-        setInput(toHexString(new Uint8Array(contents)))
-      } else {
-        setInput(contents as string);
-      }
+      setInput(JSON.parse(contents as string));
     } catch (error) {
-      throw new Error(`${error}`)
+      throw new Error(`${error}`);
     }
-    throw new Error("Function not implemented.");
   }
 
-  function onUpload(file: Blob) {
+  function onUploadFile(file: Blob) {
     if (file) {
       const reader = new FileReader();
-      if (asDes) {
-        reader.readAsText(file);
-      } else {
-        reader.readAsArrayBuffer(file);
-      }
+
+      reader.readAsText(file);
       reader.onload = (e) => {
         if (e.target?.result) {
           if (e.target !== null) {
-            processFileContents(e.target.result);
+            processFileContents(e.target.result as string);
           }
+        }
+        reader.onerror = (e) => {
+          throw new Error(`error: ${e}`);
         };
-      reader.onerror = (e) => {
-        throw new Error(`error: ${e}`)
-      }
-      }
-
+      };
     }
   }
 
+  function handleClick(): void {
+    const myModal =
+      document.getElementById("FileModal") !== null &&
+      new Modal(document.getElementById("FileModal")!, {
+        keyboard: false,
+      });
+    myModal && myModal.show();
+  }
+
   return (
-    <button className="m-1 btn btn-secondary" type="button" onClick={() => handleClick()}>
-      Upload DATA from File
-    </button>
+    <input
+      className="form-control"
+      placeholder="Upload Data from File"
+      type="file"
+      id="formFile"
+      onChange={(e) => e.target.files && onUploadFile(e.target.files[0])}
+    />
   );
 }
-

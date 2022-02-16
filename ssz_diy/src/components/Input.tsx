@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { Type } from "@chainsafe/ssz";
 import EventEmitter from "events";
 import { useEffect, useState } from "react";
 import ContainerMenu from "./ContainerMenu";
@@ -10,7 +11,9 @@ import { UintMenu } from "./UintMenu";
 import UnionMenu from "./UnionMenu";
 import VectorMenu from "./VectorMenu";
 
-type InputProps = {};
+type InputProps = {
+  aliasList: Record<string, Type<any>>
+};
 
 const _types = ["boolean", "uint", "Vector", "List", "Union", "Container"];
 let basicTypes = ["Uint", "Boolean"];
@@ -185,14 +188,14 @@ export default function Input(props: InputProps) {
               ></input>
             </div>
           </h3>
-          <SelectElementType name="SSZ Type" setType={setType} types={types} />
+          <SelectElementType aliasList={props.aliasList} name="SSZ Type" setType={setType} types={types} />
         </div>
         <div className="col-10">
           {uint && <UintMenu setString={setString} />}
-          {vector && <VectorMenu setString={setString} />}
-          {list && <ListMenu setString={setString} />}
-          {union && <UnionMenu />}
-          {container && <ContainerMenu setString={setString} />}
+          {vector && <VectorMenu aliasList={props.aliasList} setString={setString} />}
+          {list && <ListMenu aliasList={props.aliasList} setString={setString} />}
+          {union && <UnionMenu aliasList={props.aliasList}/>}
+          {container && <ContainerMenu aliasList={props.aliasList} setString={setString} />}
           {example && <ExampleMessage />}
         </div>
       </div>

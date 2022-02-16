@@ -6,13 +6,14 @@ import { SetLimit } from "./SetLimit";
 
 interface SetOptionsProps {
     newField: Type<unknown>;
-    setNewField: Dispatch<SetStateAction<Type<any>>>;
+    setNewField: Dispatch<SetStateAction<Type<unknown>>>;
     length: number;
     limit: number;
     elementType: Type<unknown>;
     setLength: Dispatch<SetStateAction<number>>;
     setLimit: Dispatch<SetStateAction<number>>;
     setElementType: Dispatch<SetStateAction<Type<unknown>>>;
+    aliasList: Record<string, Type<any>>
 }
 
 export default function SetOptions(props: SetOptionsProps) {
@@ -23,16 +24,16 @@ export default function SetOptions(props: SetOptionsProps) {
     const [elementType, setElementType] = [props.elementType, props.setElementType]
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [newField, setNewField] = [props.newField, props.setNewField]
-    // const [u_selected, setU_Selected] = useState<Type<any>>(new Number64UintType())
+    // const [u_selected, setU_Selected] = useState<Type<unknown>>(new Number64UintType())
     // const [u_length, setU_Length] = useState<number>(1);
     // const [u_limit, setU_Limit] = useState<number>(256);
-    // const [u_elementType, setU_ElementType] = useState<Type<any>>(
+    // const [u_elementType, setU_ElementType] = useState<Type<unknown>>(
     //   new NumberUintType({ byteLength: 1 })
     // );
-    // const [c_selected, setC_Selected] = useState<Type<any>>(new Number64UintType())
+    // const [c_selected, setC_Selected] = useState<Type<unknown>>(new Number64UintType())
     // const [c_length, setC_Length] = useState<number>(1);
     // const [c_limit, setC_Limit] = useState<number>(256);
-    // const [c_elementType, setC_ElementType] = useState<Type<any>>(
+    // const [c_elementType, setC_ElementType] = useState<Type<unknown>>(
     //   new NumberUintType({ byteLength: 1 })
     // );
 
@@ -44,7 +45,7 @@ export default function SetOptions(props: SetOptionsProps) {
             <div className="row my-2">
       {!isBitVectorType(newField) && (
           <div className="col">
-          <SetElementType setEType={setElementType} />
+          <SetElementType aliasList={props.aliasList} setEType={setElementType} />
         </div>
       )}
       <div className="col">
@@ -54,7 +55,7 @@ export default function SetOptions(props: SetOptionsProps) {
   ) : isListType(newField) ? (
       <div className="row">
       <div className="col">
-        <SetElementType setEType={setElementType} />
+        <SetElementType aliasList={props.aliasList} setEType={setElementType} />
       </div>
 
       <div className="col">

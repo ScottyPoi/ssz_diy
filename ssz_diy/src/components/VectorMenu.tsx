@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { Type } from "@chainsafe/ssz";
 import { ReactElement, useEffect, useState } from "react";
 import BooleanMenu from "./BooleanMenu";
 import ListMenu from "./ListMenu";
@@ -9,6 +10,7 @@ import UnionMenu from "./UnionMenu";
 
 type VectorProps = {
   setString: Function;
+  aliasList: Record<string, Type<any>>
 };
 
 export default function VectorMenu(props: VectorProps) {
@@ -46,7 +48,7 @@ export default function VectorMenu(props: VectorProps) {
         setUnion(false);
         break;
       case "Vector":
-        setMenu(<VectorMenu setString={setTypeOptions} />);
+        setMenu(<VectorMenu aliasList={props.aliasList} setString={setTypeOptions} />);
         setBoolean(false);
         setUint(false);
         setVector(true);
@@ -54,7 +56,7 @@ export default function VectorMenu(props: VectorProps) {
         setUnion(false);
         break;
       case "List":
-        setMenu(<ListMenu setString={setTypeOptions} />);
+        setMenu(<ListMenu aliasList={props.aliasList} setString={setTypeOptions} />);
         setBoolean(false);
         setUint(false);
         setVector(false);
@@ -62,7 +64,7 @@ export default function VectorMenu(props: VectorProps) {
         setUnion(false);
         break;
       case "Union":
-        setMenu(<UnionMenu />);
+        setMenu(<UnionMenu aliasList={props.aliasList} />);
         setBoolean(false);
         setUint(false);
         setVector(false);

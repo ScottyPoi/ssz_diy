@@ -55,8 +55,7 @@ export function randList(type: ListType<any> | BitListType): arrayData {
 
 export function randUnion(type: UnionType<any>): unionData {
   const types = type.types;
-  // const randIdx = Math.floor(Math.random() * types.length)
-  const randIdx = 0;
+  const randIdx = Math.floor(Math.random() * (types.length - 1))
   const randType = types[randIdx];
   const randData = randomDataSet(randType);
   const union = { selector: randIdx, value: randData };

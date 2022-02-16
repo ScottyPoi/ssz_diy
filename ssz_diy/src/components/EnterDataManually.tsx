@@ -9,11 +9,12 @@ interface EnterDataManuallyProps {
   setData: Dispatch<SetStateAction<unknown>>
   value: unknown
   setValue: Dispatch<SetStateAction<unknown>>
+  alias: string | undefined
 }
 
 export default function EnterDataManually(props: EnterDataManuallyProps) {
   const type: Type<unknown> = props.type;
-  const defaultValue = type.defaultValue();
+  const defaultValue = type.defaultValue()
   const string = JSON.stringify(type.toJson(defaultValue));
   const [typing, setTyping] = useState<string>("UNCHANGED");
   const [valid, setValid] = useState<string>("");
@@ -78,21 +79,17 @@ useEffect(() => {
     if (valid === "VALID") {
       const v = type.fromJson(JSON.parse(typing))
       setValue(v)
-      props.setValue(v)
+      props.setValue(value)
     } else {
       throw new Error(`NOT A VALID ${nameString(type)}`)
     }
   }
 
-  useEffect(() => {
-    props.setValue(value)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value])
-
   return (
     <div className="container">
       <form className="row needs-validation" noValidate>
         <label htmlFor="manualInput" className="form-label">
+          {props.alias && props.alias}:<br/>
           {nameString(props.type)}
         </label>
       {valid}

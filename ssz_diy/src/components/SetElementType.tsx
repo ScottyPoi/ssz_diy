@@ -8,11 +8,12 @@ import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 
 interface SetElementTypeProps {
   setEType: Dispatch<SetStateAction<Type<any>>>;
+  aliasList: Record<string, Type<any>>
 }
 
 export default function SetElementType(props: SetElementTypeProps) {
-  const [newType, setNewType] = useState<Type<any>>(new Number64UintType());
-  const [value, setValue] = useState("Uint64");
+  const [newType, setNewType] = useState<Type<any>>(new NumberUintType({byteLength: 1}));
+  const [value, setValue] = useState("Uint8");
   const setEType = props.setEType;
   const types = useMemo<Record<string, Type<any>>>(() => {
     return {
@@ -56,6 +57,11 @@ export default function SetElementType(props: SetElementTypeProps) {
           </option>
         );
       })}
+                    {Object.keys(props.aliasList).map((alias, idx) => {
+                return (
+                  <option value={alias} key={alias}>{alias}</option>
+                )
+              } )}
     </select>
   );
 

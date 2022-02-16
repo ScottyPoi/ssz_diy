@@ -7,15 +7,14 @@ import FileModal from "./components/FileModal";
 import EnterDataManuallyModal from "./components/EnterDataManuallyModal";
 import {
   BooleanType,
-  byteType,
   NumberUintType,
   Type,
   VectorType,
 } from "@chainsafe/ssz";
 import { useEffect, useState } from "react";
-import { aliasList } from "./components/SelectType";
 import { nameString } from "./components/Union";
 import EventEmitter from "events";
+import InfoTable from "./components/OutputBox.tsx/InfoTable";
 
 class Byte extends NumberUintType {
   constructor() {
@@ -26,12 +25,18 @@ const SimpleSerialize = new EventEmitter();
 
 function App() {
   const [typeName, setTypeName] = useState<string>("Boolean");
-  const [type, setType] = useState<Type<any>>(new BooleanType());
+  const [type, setType] = useState<Type<unknown>>(new BooleanType());
   const [data, setData] = useState<unknown>();
   const [aliasList, setAliasList] = useState<Record<string, Type<unknown>>>({
     Byte: new Byte(),
     Bytes32: new VectorType({ elementType: new Byte(), length: 32 }),
   });
+  const [showInfo, setShowInfo] = useState(<></>)
+
+  async function setInfo(dataSet: unknown) {
+    const t = type;
+    setShowInfo(<InfoTable sszTypeName={typeName} data={dataSet} type={t} />);
+  }
 
   function addToList(alias: string, type: Type<unknown>) {
     let list = aliasList;
@@ -49,6 +54,7 @@ function App() {
 
   useEffect(() => {
     init();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function getType() {
@@ -57,8 +63,8 @@ function App() {
 
   return (
     <>
-      <FileModal typeName={typeName} />
-      <EnterDataManuallyModal data={data} setData={setData} type={getType()} />
+      <FileModal type={type} setInfo={setInfo} typeName={typeName} />
+      <EnterDataManuallyModal alias={Object.keys(aliasList).includes(typeName) ? typeName : undefined} data={data} setData={setData} type={getType()} setInfo={setInfo} />
 
       <AliasModal
         key={Date.now()}
@@ -81,6 +87,8 @@ function App() {
           data={data}
           aliasList={aliasList}
           SimpleSerialize={SimpleSerialize}
+          showInfo={showInfo}
+          setShowInfo={setShowInfo}
         />{" "}
         {/* <CreateValue aliasList={aliasList} create={setNewAlias}/> */}
       </Router>

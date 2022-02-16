@@ -1,5 +1,5 @@
 import {
-  BigIntUintType,
+  BooleanType,
   isBitListType,
   isBitVectorType,
   isBooleanType,
@@ -8,18 +8,26 @@ import {
   isVectorType,
   NumberUintType,
   Type,
-  UnionType,
 } from "@chainsafe/ssz";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Text } from "@chakra-ui/react";
+import { Dispatch, SetStateAction, useState } from "react";
 import SetContainerField from "./setContainerField";
 import SetElementType from "./SetElementType";
 import SetLength from "./setLength";
 import { SetLimit } from "./SetLimit";
+import TypeList from "./TypeList";
 
 interface UnionProps {
-  setUnion: Dispatch<SetStateAction<Type<unknown>>>;
+  setUnion: Dispatch<SetStateAction<Type<any>>>;
+  unionTypes: Type<any>[]
   setUnionTypes: Dispatch<SetStateAction<Type<any>[]>>;
   setTypeNames: Dispatch<SetStateAction<string[]>>;
+  typeNames: string[];
+  add: (type: Type<any>) => void 
+  up: (idx: number) => void
+  down: (idx: number) => void
+  remove: (idx: number) => void
+  aliasList: Record<string, Type<any>>
 }
 
 export function nameString(type: Type<any>): string {
@@ -44,78 +52,51 @@ export function nameString(type: Type<any>): string {
 export default function Union(props: UnionProps) {
   const [length, setLength] = useState(1);
   const [limit, setLimit] = useState(256);
-  const [elementType, setElementType] = useState<Type<unknown>>(
+  const [elementType, setElementType] = useState<Type<any>>(
     new NumberUintType({ byteLength: 1 })
   );
-  const [types, setTypes] = useState<Type<any>[]>([
-    new BigIntUintType({ byteLength: 32 }),
-  ]);
-  const [selected, setSelected] = useState<Type<any>>(
-    new BigIntUintType({ byteLength: 32 })
-  );
-  const [idx, setIdx] = useState(0);
-  const [idxRemove, setIdxRemove] = useState(0);
-
-  async function getTypes() {
-    return types;
-  }
-
-  useEffect(() => {
-    getTypes().then((t) => {
-      props.setUnionTypes(t);
-      props.setTypeNames(
-        types.map((type) => {
-          return nameString(type);
-        })
-      );
-      props.setUnion(new UnionType({ types: t }));
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [types]);
-
-  function addType(type: Type<unknown>, idx?: number) {
-    let t = [...types];
-    if (idx) {
-      setTypes(Array.from([...t.slice(0, idx), type, ...t.slice(idx)]));
-    } else {
-      t.push(type);
-      setTypes(t);
-    }
-  }
+  const [selected, setSelected] = useState<Type<any>>(new BooleanType());
 
 
-  function removeType(idx: number) {
-    let beg = types.slice(0, idx);
-    let end = types.slice(idx + 1);
-    setTypes(Array.from([...beg, ...end]));
-  }
+
+
 
   return (
     <div className="container">
       <div className="row m-1">
         <div id="Set Type" className="col-4 m-3">
-          <SetContainerField
-            newField={selected}
-            setNewField={setSelected}
-            length={length}
-            limit={limit}
-            elementType={elementType}
-            setLength={setLength}
-            setLimit={setLimit}
-            setElementType={setElementType}
-          />
+          {selected && (
+            <SetContainerField
+              newField={selected}
+              setNewField={setSelected}
+              length={length}
+              limit={limit}
+              elementType={elementType}
+              setLength={setLength}
+              setLimit={setLimit}
+              setElementType={setElementType}
+              aliasList={props.aliasList}
+            />
+          )}
         </div>
         <div id="Type Functions" className="col-5 m-1">
           {/* <div role='group' className="btn-group-vertical fluid"> */}
           <div className="container m-2 border">
             <div className="row m-1">
-              <p className="text-center">{nameString(selected)}</p>
+              <Text>{nameString(selected)}</Text>
+              <button
+                type="button"
+                className="btn btn-sm btn-dark m-1"
+                onClick={() => props.add(selected)}
+              >
+                + ADD TO TYPES
+              </button>
             </div>
             {isVectorType(selected) ? (
               <div className="row my-2">
                 {!isBitVectorType(selected) && (
                   <div className="col">
-                    <SetElementType setEType={setElementType} />
+                    <SetElementType aliasList={props.aliasList} setEType={setElementType} />
                   </div>
                 )}
                 <div className="col">
@@ -125,7 +106,7 @@ export default function Union(props: UnionProps) {
             ) : isListType(selected) ? (
               <div className="row">
                 <div className="col">
-                  <SetElementType setEType={setElementType} />
+                  <SetElementType aliasList={props.aliasList} setEType={setElementType} />
                 </div>
 
                 <div className="col">
@@ -141,47 +122,6 @@ export default function Union(props: UnionProps) {
             )}
           </div>
           <div className="row m-2">
-            <div className="col-7 my-2">
-              <div className="grid gap-2">
-                <p className="my-2 text-end">ADD TYPE AT INDEX</p>
-                <p className="mt-4 text-end">REMOVE TYPE AT INDEX</p>
-              </div>
-            </div>{" "}
-            <div className="col-3 my-2">
-              <div className="d-grid  gap-2">
-                <input
-                  className="form-control "
-                  type="number"
-                  value={idxRemove}
-                  onChange={(e) => setIdxRemove(parseInt(e.target.value))}
-                />{" "}
-                <input
-                  className="form-control "
-                  type="number"
-                  value={types.length}
-                  onChange={(e) => setIdx(parseInt(e.target.value))}
-                />{" "}
-              </div>
-            </div>
-            <div className="col-2 mt-2">
-              <div className="d-grid  gap-2"></div>
-              <div className="d-grid  gap-2">
-                <button
-                  type="button"
-                  className="btn btn-sm btn-dark m-1"
-                  onClick={() => addType(selected, idx)}
-                >
-                  +
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-dark btn-sm m-1"
-                  onClick={() => removeType(idx)}
-                >
-                  -
-                </button>
-              </div>
-            </div>
             <div className="row p-2">
               {isBitListType(selected) ? (
                 <p className="text-center">BitList{`<limit: ${limit}>`}</p>
@@ -211,9 +151,14 @@ export default function Union(props: UnionProps) {
         </div>
         <div className="col border m-2">
           <div className="row border p-0">
-            <p className="text-center" style={{fontSize: '1.2rem', fontWeight: 'bold'}}>Union Types</p>
+            <p
+              className="text-center"
+              style={{ fontSize: "1.2rem", fontWeight: "bold" }}
+            >
+              Union Types
+            </p>
           </div>
-          {types.map((typ, idx) => {
+          <TypeList types={props.unionTypes} typeNames={props.typeNames} up={props.up} down={props.down} remove={props.remove} />          {/* {types.map((typ, idx) => {
             return (
               <div className="row mt-1">
                 <p>
@@ -221,7 +166,7 @@ export default function Union(props: UnionProps) {
                 </p>
               </div>
             );
-          })}
+          })} */}
         </div>
       </div>
     </div>

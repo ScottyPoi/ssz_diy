@@ -1,6 +1,6 @@
 import { Type } from "@chainsafe/ssz";
 import EventEmitter from "events";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
 interface AliasModalProps {
     type: Type<unknown>
@@ -20,6 +20,7 @@ export default function AliasModal(props: AliasModalProps) {
         props.addToList(name, props.type)
         props.setTypeName(name)
         props.setType(props.type)
+        setAdded(true)
     }
 
     return (

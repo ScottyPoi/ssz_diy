@@ -4,7 +4,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 interface SelectTypeProps {
   type: Type<any>;
-  setType: Dispatch<SetStateAction<Type<any>>>;
+  setType: Dispatch<SetStateAction<Type<unknown>>>;
   typeName: string;
   setTypeName: Dispatch<SetStateAction<string>>;
   nativeTypes: Record<string, string[]>;
@@ -24,7 +24,6 @@ export default function SelectType(props: SelectTypeProps) {
     Byte: "Uint8",
     Bytes32: "Vector<elementType: Byte, length: 32>",
   });
-  const type = props.type;
   const aliasList = props.aliasList
 
   useEffect(() => {
@@ -69,7 +68,7 @@ export default function SelectType(props: SelectTypeProps) {
           {Object.keys(props.nativeTypes).map((type, idx) => {
             return props.nativeTypes[type].map((_type) => {
               return (
-                <option selected={_type === typeName} key={_type} value={_type}>
+                <option key={_type} value={_type}>
                   {_type}
                 </option>
               );
@@ -103,7 +102,7 @@ export default function SelectType(props: SelectTypeProps) {
         >
           {Object.keys(props.aliasList).map((alias, idx) => {
             return (
-              <option selected={alias === typeName} key={idx} value={alias}>
+              <option key={idx} value={alias}>
                 {alias}
               </option>
             );

@@ -1,32 +1,30 @@
 import { Type } from "@chainsafe/ssz";
 import * as bootstrap from "bootstrap";
+import { Dispatch, ReactElement, SetStateAction } from "react";
+import { nameString } from "../Union";
 import UploadFile from "../UploadFile";
 
 interface InputProps {
-  type: Type<any>
+  type: Type<any>;
   makeInfo: () => Promise<void>;
+  aliasList: Record<string, Type<any>>;
+  setData: Dispatch<SetStateAction<unknown>>;
+  setShowInfo: Dispatch<SetStateAction<ReactElement>>;
 }
-
 
 export default function InputBox(props: InputProps) {
   function handleEnterData() {
     const myModal =
-    document.getElementById(`EnterDataManuallyModal`) !== null &&
-    new bootstrap.Modal(
-      document.getElementById(`EnterDataManuallyModal`)!,
-      {
+      document.getElementById(`EnterDataManuallyModal`) !== null &&
+      new bootstrap.Modal(document.getElementById(`EnterDataManuallyModal`)!, {
         keyboard: false,
-      }
-      );
-      myModal && myModal.show();
+      });
+    myModal && myModal.show();
   }
-  
+
   return (
-    <div className="btn-group m-1">
-      <button type="button" className="btn btn-secondary m-1">
-        Save Type as Alias
-      </button>
-      <UploadFile />
+    <div className="btn-group m-1 btn-group-sm">
+      <UploadFile type={props.type} typeName={nameString(props.type)} setData={props.setData} setShowInfo={props.setShowInfo} />
       <button
         onClick={async () => await props.makeInfo()}
         className="btn btn-secondary m-1"

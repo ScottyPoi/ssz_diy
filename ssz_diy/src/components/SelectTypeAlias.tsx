@@ -19,7 +19,7 @@ class Byte extends NumberUintType {
 interface SelectTypeAliasProps {
   setTypeName: Dispatch<SetStateAction<string>>;
   typeName: string;
-  setType: Dispatch<SetStateAction<Type<any>>>;
+  setType: Dispatch<SetStateAction<Type<unknown>>>;
 }
 
 export default function SelectTypeAlias(props: SelectTypeAliasProps) {

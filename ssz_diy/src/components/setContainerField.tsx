@@ -2,7 +2,6 @@ import {
   BigIntUintType,
   BitListType,
   BitVectorType,
-  BooleanType,
   ContainerType,
   ListType,
   Number64UintType,
@@ -14,35 +13,36 @@ import {
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 
 interface SetElementTypeProps {
-  newField: Type<unknown>;
+  newField: Type<any>;
   setNewField: Dispatch<SetStateAction<Type<any>>>;
   length: number;
   limit: number;
-  elementType: Type<unknown>;
+  elementType: Type<any>;
   setLength: Dispatch<SetStateAction<number>>;
   setLimit: Dispatch<SetStateAction<number>>;
-  setElementType: Dispatch<SetStateAction<Type<unknown>>>;
+  setElementType: Dispatch<SetStateAction<Type<any>>>;
+  aliasList: Record<string, Type<any>>;
 }
 
 export default function SetContainerField(props: SetElementTypeProps) {
   const [newType, setNewType] = useState<Type<any>>(props.newField);
-  const [value, setValue] = useState("Uint64");
-const length = props.length
-const limit = props.limit
-//   const [_length, set_Length] = useState(props.length)
+  const [value, setValue] = useState("Uint8");
+  const length = props.length;
+  const limit = props.limit;
+  //   const [_length, set_Length] = useState(props.length)
   // const [limit, setLimit] = [props.limit, props.setLimit]
-//   const [limit, setLimit] = useState(512);
+  //   const [limit, setLimit] = useState(512);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [unionTypes, setUnionTypes] = useState([new BooleanType()]);
+  const [unionTypes, setUnionTypes] = useState<Type<any>[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [containerFields, setContainerFields] = useState({
-    exampleKey: new BigIntUintType({ byteLength: 32 }),
   });
-  const elementType = props.elementType
+  const elementType = props.elementType;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [newField, setNewField] = [props.newField, props.setNewField];
   const types = useMemo<Record<string, Type<any>>>(() => {
-      return {Uint8: new NumberUintType({ byteLength: 1 }),
+    return {
+      Uint8: new NumberUintType({ byteLength: 1 }),
       Uint16: new NumberUintType({ byteLength: 2 }),
       Uint32: new NumberUintType({ byteLength: 4 }),
       Uint64: new Number64UintType(),
@@ -53,13 +53,14 @@ const limit = props.limit
       Vector: new VectorType({ elementType: elementType, length: length }),
       List: new ListType({ elementType: elementType, limit: limit }),
       Union: new UnionType({ types: unionTypes }),
-      Container: new ContainerType({ fields: containerFields }),}
+      Container: new ContainerType({ fields: containerFields }),
+    };
   }, [length, limit, elementType, unionTypes, containerFields]);
 
-
-
   useEffect(() => {
-    setNewType(types[value]);
+    Object.keys(props.aliasList).includes(value)
+      ? setNewType(props.aliasList[value])
+      : setNewType(types[value]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, types]);
   useEffect(() => {
@@ -80,6 +81,13 @@ const limit = props.limit
         return (
           <option value={k} key={k}>
             {k}
+          </option>
+        );
+      })}
+      {Object.keys(props.aliasList).map((alias, idx) => {
+        return (
+          <option value={alias} key={alias}>
+            {alias}
           </option>
         );
       })}

@@ -1,7 +1,10 @@
+import { Type } from "@chainsafe/ssz";
+
 type SelectElementTypeProps = {
 setType: Function
 name: string
 types: string[]
+aliasList: Record<string, Type<any>>
 }
 
 export default function SelectElementType(props: SelectElementTypeProps) {
