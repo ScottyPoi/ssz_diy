@@ -1,7 +1,7 @@
 import { fromHexString, isListType, isVectorType, toHexString, Type } from "@chainsafe/ssz";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import yaml from "js-yaml";
-import { nameString } from "./Union";
+import { nameString } from "../TypeMenus/Union";
 
 interface EnterDataManuallyProps {
   type: Type<any>;

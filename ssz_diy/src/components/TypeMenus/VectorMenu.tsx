@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Type } from "@chainsafe/ssz";
 import { ReactElement, useEffect, useState } from "react";
-import BooleanMenu from "./BooleanMenu";
 import ListMenu from "./ListMenu";
-import SelectBasicType from "./SelectBasicType";
-import SelectElementType from "./SelectElementType";
+import SelectBasicType from "../SelectMenus/SelectBasicType";
 import { UintMenu } from "./UintMenu";
 import UnionMenu from "./UnionMenu";
 
@@ -72,6 +70,7 @@ export default function VectorMenu(props: VectorProps) {
         setUnion(true);
         break;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type]);
 
   return (

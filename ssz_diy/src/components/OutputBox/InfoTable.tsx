@@ -14,9 +14,9 @@ import {
   Type,
 } from "@chainsafe/ssz";
 import { Text } from "@chakra-ui/react";
-import { UnionObject } from "../../RandomData";
-import { dataSet } from "../randUint";
-import { nameString } from "../Union";
+import { UnionObject } from "../DataEntry/RandomData";
+import { dataSet } from "../DataEntry/randUint";
+import { nameString } from "../TypeMenus/Union";
 import { saveAs } from "file-saver";
 import { useState } from "react";
 
@@ -57,51 +57,6 @@ export default function InfoTable(props: InfoTableProps) {
   const deserialized = props.type.deserialize(serialized);
   const json = JSON.stringify(props.type.toJson(deserialized));
   // const containerLeaves = props.leaves ? props.leaves : isContainerType(props.type) ? props.type.tree_getLeafGindices(props.type.struct_convertToTree(props.data)) : undefined
-  function showTree(compType: CompositeType<any>) {
-    // const compType = props.type as CompositeType<Type<unknown>>;
-    const tree = compType.struct_convertToTree(deserialized);
-
-    const leafGindices = isContainerType(compType)
-      ? Object.keys(compType.fields).map((field) => {
-          return compType.getPropertyGindex(field);
-        })
-      : compType.tree_getLeafGindices(tree);
-    return leafGindices.map((v, idx) => {
-      return (
-        <tr key={idx}>
-          <th scope="row">
-            {/* {containerLeaves.toString()} */}
-            {v.toString()}
-            {props.leaves && props.leaves[idx + 1].toString()}
-            {isContainerType(compType) &&
-              `: ${Object.keys(compType.fields)[idx]}`}
-          </th>
-          <td>[{getProofNodes(Number(v)).toString()}]</td>
-          <td>
-            <FontAwesomeIcon icon={faCopy} />
-          </td>
-
-          {/* <td>[{props.leaves && getProofNodes(Number(props.leaves[idx])).toString()}]</td> */}
-          <td className="text-break">
-            [
-            {tree.getSingleProof(v).map((p, idx) => {
-              return (
-                <>
-                  {toHexString(p)}
-                  {idx !== tree.getSingleProof(v).length - 1 && (
-                    <>
-                      , <br />
-                    </>
-                  )}
-                </>
-              );
-            })}
-            ]
-          </td>
-        </tr>
-      );
-    });
-  }
 
   function merkleAccordion(compType: CompositeType<any>) {
     const tree = compType.struct_convertToTree(deserialized);

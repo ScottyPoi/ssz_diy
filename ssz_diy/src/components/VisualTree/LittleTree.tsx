@@ -3,7 +3,7 @@ import {
 } from "@chainsafe/ssz";
 import { useState } from "react";
 import LittleNode from "./LittleNode";
-import { nextPowerOf2 } from "./VisualTree/Tree";
+import { nextPowerOf2 } from "./Tree";
 
 export interface LittleTreeProps {
   type: CompositeType<any>;

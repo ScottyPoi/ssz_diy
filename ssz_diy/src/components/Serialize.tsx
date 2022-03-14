@@ -22,19 +22,18 @@ import {
   ContainerType,
   isCompositeType,
 } from "@chainsafe/ssz";
-import { randomDataSet } from "./randUint";
-import SelectType from "./SelectType";
-import InfoTable from "./OutputBox.tsx/InfoTable";
-import SetLength from "./setLength";
-import SetElementType from "./SetElementType";
-import { SetLimit } from "./SetLimit";
-import { UnionObject } from "../RandomData";
-import Union, { nameString } from "./Union";
-import Container from "./Container";
+import { randomDataSet } from "./DataEntry/randUint";
+import SelectType from "./SelectMenus/SelectType";
+import InfoTable from "./OutputBox/InfoTable";
+import SetLength from "./Setters/setLength";
+import SetElementType from "./Setters/SetElementType";
+import { SetLimit } from "./Setters/SetLimit";
+import { UnionObject } from "./DataEntry/RandomData";
+import Union, { nameString } from "./TypeMenus/Union";
+import Container from "./TypeMenus/Container";
 import EventEmitter from "events";
 import { Modal } from "bootstrap";
-import LittleTree from "./LittleTree";
-// import LittleTree, {LittleTreeProps} from "./LittleTree";
+import LittleTree from "./VisualTree/LittleTree";
 
 interface SerializeProps {
   userTypes: string[];

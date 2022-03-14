@@ -1,8 +1,6 @@
 import { Type } from "@chainsafe/ssz";
 import { useEffect, useState } from "react";
-import { JsxElement } from "typescript";
-import SelectBasicType from "./SelectBasicType";
-import SelectElementType from "./SelectElementType";
+import SelectElementType from "../SelectMenus/SelectElementType";
 
 let basics = [
   "Boolean",

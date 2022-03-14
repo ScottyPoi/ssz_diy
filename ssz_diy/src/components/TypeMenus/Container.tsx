@@ -10,10 +10,10 @@ import {
   Type,
 } from "@chainsafe/ssz";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import SetContainerField from "./setContainerField";
-import { SetLimit } from "./SetLimit";
-import SetOptions from "./SetOptions";
-import { nameString } from "./Union";
+import SetContainerField from "../Setters/setContainerField";
+import { SetLimit } from "../Setters/SetLimit";
+import SetOptions from "../Setters/SetOptions";
+import { nameString } from "../TypeMenus/Union";
 
 interface ContainerProps {
   setContainerTypes: Dispatch<SetStateAction<Record<string, Type<any> | null>>>;

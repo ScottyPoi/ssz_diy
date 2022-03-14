@@ -11,10 +11,10 @@ import {
 } from "@chainsafe/ssz";
 import { Text } from "@chakra-ui/react";
 import { Dispatch, SetStateAction, useState } from "react";
-import SetContainerField from "./setContainerField";
-import SetElementType from "./SetElementType";
-import SetLength from "./setLength";
-import { SetLimit } from "./SetLimit";
+import SetContainerField from "../Setters/setContainerField";
+import SetElementType from "../Setters/SetElementType";
+import SetLength from "../Setters/setLength";
+import { SetLimit } from "../Setters/SetLimit";
 import TypeList from "./TypeList";
 
 interface UnionProps {

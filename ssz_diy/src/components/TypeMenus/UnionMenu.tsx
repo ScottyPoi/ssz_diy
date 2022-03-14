@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Type } from "@chainsafe/ssz"
 import { useState } from "react"
-import SelectElementType from "./SelectElementType"
+import SelectElementType from "../SelectMenus/SelectElementType"
 
 type UnionMenuProps = {
     aliasList: Record<string, Type<any>>

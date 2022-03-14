@@ -4,7 +4,7 @@ import Serialize from "./components/Serialize";
 import { ssz } from "@chainsafe/lodestar-types";
 import AliasModal from "./components/AliasModal";
 import FileModal from "./components/FileModal";
-import EnterDataManuallyModal from "./components/EnterDataManuallyModal";
+import EnterDataManuallyModal from "./components/DataEntry/EnterDataManuallyModal";
 import {
   BooleanType,
   NumberUintType,
@@ -12,9 +12,9 @@ import {
   VectorType,
 } from "@chainsafe/ssz";
 import { useEffect, useState } from "react";
-import { nameString } from "./components/Union";
+import { nameString } from "./components/TypeMenus/Union";
 import EventEmitter from "events";
-import InfoTable from "./components/OutputBox.tsx/InfoTable";
+import InfoTable from "./components/OutputBox/InfoTable";
 
 class Byte extends NumberUintType {
   constructor() {
@@ -76,8 +76,6 @@ function App() {
         setTypeName={setTypeName}
       />
       <Router>
-        {/* <AliasMenu /> */}
-        {/* <Input /> */}
         <Serialize
           userTypes={[]}
           t={type}
@@ -90,7 +88,6 @@ function App() {
           showInfo={showInfo}
           setShowInfo={setShowInfo}
         />{" "}
-        {/* <CreateValue aliasList={aliasList} create={setNewAlias}/> */}
       </Router>
     </>
   );

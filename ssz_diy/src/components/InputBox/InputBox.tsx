@@ -1,8 +1,8 @@
 import { Type } from "@chainsafe/ssz";
 import * as bootstrap from "bootstrap";
 import { Dispatch, ReactElement, SetStateAction } from "react";
-import { nameString } from "../Union";
-import UploadFile from "../UploadFile";
+import { nameString } from "../TypeMenus/Union";
+import UploadFile from "../DataEntry/UploadFile";
 
 interface InputProps {
   type: Type<any>;

@@ -2,14 +2,14 @@
 import { Type } from "@chainsafe/ssz";
 import EventEmitter from "events";
 import { useEffect, useState } from "react";
-import ContainerMenu from "./ContainerMenu";
-import ExampleMessage from "./ExampleMessage";
-import ListMenu from "./ListMenu";
-import Prompt from "./Prompt";
-import SelectElementType from "./SelectElementType";
-import { UintMenu } from "./UintMenu";
-import UnionMenu from "./UnionMenu";
-import VectorMenu from "./VectorMenu";
+import ContainerMenu from "../TypeMenus/ContainerMenu";
+import ExampleMessage from "../ExampleMessage";
+import ListMenu from "../TypeMenus/ListMenu";
+import Prompt from "../Prompt";
+import SelectElementType from "../SelectMenus/SelectElementType";
+import { UintMenu } from "../TypeMenus/UintMenu";
+import UnionMenu from "../TypeMenus/UnionMenu";
+import VectorMenu from "../TypeMenus/VectorMenu";
 
 type InputProps = {
   aliasList: Record<string, Type<any>>

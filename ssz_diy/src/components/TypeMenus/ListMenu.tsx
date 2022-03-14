@@ -4,7 +4,7 @@ import VectorMenu from "./VectorMenu";
 import BitVectorMenu from "./BitVectorMenu";
 import { UintMenu } from "./UintMenu";
 import UnionMenu from "./UnionMenu";
-import SelectBasicType from "./SelectBasicType";
+import SelectBasicType from "../SelectMenus/SelectBasicType";
 import BitListMenu from "./BitListMenu";
 import { Type } from "@chainsafe/ssz";
 
@@ -104,6 +104,7 @@ export default function ListMenu(props: ListProps) {
         setUnion(true);
         break;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type]);
 
   return (

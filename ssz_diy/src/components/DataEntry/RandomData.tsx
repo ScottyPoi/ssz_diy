@@ -13,8 +13,8 @@ import {
   isVectorType,
   Type,
 } from "@chainsafe/ssz";
-import { Dispatch, SetStateAction, useState } from "react";
-import { randBasic, randVector, randList, randUnion } from "./components/randUint";
+import { Dispatch, SetStateAction } from "react";
+import { randBasic, randVector, randList, randUnion } from "./randUint";
 
 export interface UnionObject {
   selector: number
@@ -30,7 +30,6 @@ export default async function RandomData(props: RandomDataProps) {
   let values: number | bigint | boolean | unknown[] | UnionObject = 0;
 
   const t = props.t;
-  // const setValues = props.setValues
   if (isBasicType(t)) {
     values = randBasic(t);
   } else if (isCompositeType(t)) {
