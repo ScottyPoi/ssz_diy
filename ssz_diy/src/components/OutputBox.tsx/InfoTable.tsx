@@ -18,6 +18,7 @@ import { UnionObject } from "../../RandomData";
 import { dataSet } from "../randUint";
 import { nameString } from "../Union";
 import { saveAs } from "file-saver";
+import { useState } from "react";
 
 interface InfoTableProps {
   type: Type<any>;
@@ -26,6 +27,7 @@ interface InfoTableProps {
   container?: boolean;
   leaves?: bigint[];
   sszTypeName: string;
+  top?: boolean;
   // setProofNode: Function;
 }
 
@@ -49,6 +51,7 @@ function getProofNodes(leaf: number) {
 export default function InfoTable(props: InfoTableProps) {
   // const _tree = props.tree;
   const data = props.data;
+  const [proofString, setProofString] = useState<[bigint, number]>();
   const serialized = props.type.serialize(data);
   const hashTreeRoot = props.type.hashTreeRoot(data);
   const deserialized = props.type.deserialize(serialized);
@@ -99,6 +102,80 @@ export default function InfoTable(props: InfoTableProps) {
       );
     });
   }
+
+  function merkleAccordion(compType: CompositeType<any>) {
+    const tree = compType.struct_convertToTree(deserialized);
+    const leafGindices = isContainerType(compType)
+      ? Object.keys(compType.fields).map((field) => {
+          return compType.getPropertyGindex(field);
+        })
+      : compType.tree_getLeafGindices(tree);
+    proofString || setProofString([leafGindices[0], 0]);
+    return (
+      <div className="row ps-4 ms-2">
+        <div className="col-3">Merkle Proof By Leaf</div>
+        <div
+          className="col-3 text-break py-0 mb-1 px-2 mx-2"
+          style={{ maxHeight: "200px", overflowY: "scroll" }}
+        >
+          {" "}
+          <div>
+            {leafGindices.map((g, idx) => {
+              return (
+                <button
+                style={{ backgroundColor: `#${idx%2===0 ? 'ffdddd' : 'ddddff'}`}}
+                  type="button"
+                  className={`btn btn-sm p-0 ${
+                    proofString === [g, idx] && `btn-primary`
+                  }`}
+                  onClick={() => setProofString([g, idx])}
+                >
+                  {g.toString()}{" "}
+                  {props.leaves && props.leaves[idx + 1].toString()}{" "}
+                  {isContainerType(compType) &&
+                    `: ${Object.keys(compType.fields)[idx]}`}{" "}
+                  = [{getProofNodes(Number(g)).toString()}]
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <div className="col-5">
+          {proofString && merkleAccordionItem(proofString, tree, compType)}
+        </div>
+      </div>
+    );
+  }
+
+  function merkleAccordionItem(
+    [g, idx]: [bigint, number],
+    tree: Tree,
+    compType: CompositeType<any>
+  ) {
+    return (
+      <div>
+        <h4>
+          {g.toString()}
+          {props.leaves && props.leaves[idx + 1].toString()}{" "}
+          {isContainerType(compType) &&
+            `: ${Object.keys(compType.fields)[idx]}`}{" "}
+          {`->`} [{getProofNodes(Number(g)).toString()}]<br />
+        </h4>
+        <p className="text-break">
+          [
+          {tree.getSingleProof(g).map((p, idx) => {
+            return (
+              <span style={{ backgroundColor: `#${idx%2===0 ? 'ffffff' : 'cccccc'}`}}>
+                {toHexString(p)}{idx !== tree.getSingleProof(g).length - 1 && `,`}
+              </span>
+            );
+          })}
+          ]
+        </p>
+      </div>
+    );
+  }
+
   const serial = Array.from(toHexString(serialized)).map((v, idx) => {
     return (
       <span
@@ -118,11 +195,50 @@ export default function InfoTable(props: InfoTableProps) {
   return (
     <div style={{ fontSize: "0.8rem" }}>
       <div className="row my-2 justify-content-start">
-        {json && (
+        {/* {props.top && json && (
           <div className="d-grid col-6 text-break overflow-auto">
             <button type="button" onClick={() => downloadFile(json, "json")}>
               SAVE DATA AS JSON FILE
             </button>
+          </div>
+        )} */}
+        {props.top && json && (
+          <div className="d-grid col-4 text-break overflow-auto">
+            <div className="accordion" id="jsonAccordion">
+              <div className="accorion-item">
+                <p className="accordion-header" id="jsonHeader">
+                  <button
+                    style={{ color: "white", backgroundColor: "gray" }}
+                    type="button"
+                    className="accordion-button collapsed"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#jsonBody"
+                    aria-expanded="false"
+                    aria-controls="jsonBody"
+                  >
+                    SAVE DATA AS JSON FILE
+                  </button>
+                </p>
+                <div
+                  id="jsonBody"
+                  className="accordion-collapse collapse"
+                  aria-labelledby="jsonHeader"
+                  data-bs-parent="#jsonAccordion"
+                >
+                  <div className="accordion-body">
+                    {" "}
+                    <button
+                      type="button"
+                      onClick={() => downloadFile(json, "json")}
+                    >
+                      DOWNLOAD
+                    </button>
+                    <br />
+                    {json}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -242,6 +358,7 @@ export default function InfoTable(props: InfoTableProps) {
           </div>
         </div>
       )}
+      {isCompositeType(props.type) && <>{merkleAccordion(props.type)}</>}
       <div className="table-responsive my-1 ms-4 py-1 ps-3">
         <table className="table table-sm">
           <tbody style={{ fontSize: "0.7rem" }}>
@@ -285,7 +402,7 @@ export default function InfoTable(props: InfoTableProps) {
 
             {isCompositeType(props.type) ? (
               <>
-                {props.type.struct_getChunkCount(deserialized) > 1 && (
+                {/* {props.type.struct_getChunkCount(deserialized) > 1 && (
                   <tr>
                     <th scope="row">Merkle Proof by Leaf:</th>
                     <td colSpan={2}>
@@ -294,7 +411,7 @@ export default function InfoTable(props: InfoTableProps) {
                       </table>
                     </td>
                   </tr>
-                )}
+                )} */}
                 <tr>
                   <th scope="row">
                     Values

@@ -35,7 +35,7 @@ function App() {
 
   async function setInfo(dataSet: unknown) {
     const t = type;
-    setShowInfo(<InfoTable sszTypeName={typeName} data={dataSet} type={t} />);
+    setShowInfo(<InfoTable top sszTypeName={typeName} data={dataSet} type={t} />);
   }
 
   function addToList(alias: string, type: Type<unknown>) {

@@ -24,7 +24,7 @@ export default function UploadFile(props: UploadFileProps) {
   useEffect(() => {
     input && props.setData(input);
     props.setShowInfo(
-      <InfoTable sszTypeName={props.typeName} data={input} type={props.type} />
+      <InfoTable top sszTypeName={props.typeName} data={input} type={props.type} />
     );
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [input]);

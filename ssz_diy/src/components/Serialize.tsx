@@ -133,13 +133,13 @@ export default function Serialize(props: SerializeProps) {
     const t = typeSelect;
     const dataSet = randomDataSet(t);
     setDataSet(dataSet);
-    setShowInfo(<InfoTable sszTypeName={typeName} data={dataSet} type={t} />);
+    setShowInfo(<InfoTable top sszTypeName={typeName} data={dataSet} type={t} />);
   }
 
   async function setInfo(dataSet: unknown) {
     const t = typeSelect;
     setDataSet(dataSet);
-    setShowInfo(<InfoTable sszTypeName={typeName} data={dataSet} type={t} />);
+    setShowInfo(<InfoTable top sszTypeName={typeName} data={dataSet} type={t} />);
   }
 
   useEffect(() => {
