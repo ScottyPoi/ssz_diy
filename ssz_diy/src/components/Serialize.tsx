@@ -262,15 +262,6 @@ export default function Serialize(props: SerializeProps) {
                 }
               </div>
             </div>
-            <div className="col m-1 p-1">
-              <button
-                onClick={() => handleAddType()}
-                type="button"
-                className="btn btn-secondary m-1"
-              >
-                Add Type as Alias
-              </button>
-            </div>
           </div>
           {alias || (
             <>
@@ -380,12 +371,4 @@ export default function Serialize(props: SerializeProps) {
   );
 }
 
-function handleAddType(): void {
-  const modal = document.getElementById("AliasModal");
-  const myModal =
-    modal !== null &&
-    new Modal(modal, {
-      keyboard: false,
-    });
-  modal !== null && myModal && myModal.show();
-}
+

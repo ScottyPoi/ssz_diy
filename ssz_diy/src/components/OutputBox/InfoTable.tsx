@@ -13,7 +13,7 @@ import {
   toHexString,
   Type,
 } from "@chainsafe/ssz";
-import { Text } from "@chakra-ui/react";
+import { Select, Text } from "@chakra-ui/react";
 import { UnionObject } from "../DataEntry/RandomData";
 import { dataSet } from "../DataEntry/randUint";
 import { nameString } from "../TypeMenus/Union";
@@ -51,7 +51,7 @@ function getProofNodes(leaf: number) {
 export default function InfoTable(props: InfoTableProps) {
   // const _tree = props.tree;
   const data = props.data;
-  const [proofString, setProofString] = useState<[bigint, number]>();
+  const [proofString, setProofString] = useState<[string, string]>();
   const serialized = props.type.serialize(data);
   const hashTreeRoot = props.type.hashTreeRoot(data);
   const deserialized = props.type.deserialize(serialized);
@@ -65,7 +65,7 @@ export default function InfoTable(props: InfoTableProps) {
           return compType.getPropertyGindex(field);
         })
       : compType.tree_getLeafGindices(tree);
-    proofString || setProofString([leafGindices[0], 0]);
+    proofString || setProofString([leafGindices[0].toString(), "0"]);
     return (
       <div className="row ps-4 ms-2">
         <div className="col-3">Merkle Proof By Leaf</div>
@@ -73,27 +73,19 @@ export default function InfoTable(props: InfoTableProps) {
           className="col-3 text-break py-0 mb-1 px-2 mx-2"
           style={{ maxHeight: "200px", overflowY: "scroll" }}
         >
-          {" "}
-          <div>
+          <Select onChange={(e) => setProofString} value={proofString}>
             {leafGindices.map((g, idx) => {
               return (
-                <button
-                style={{ backgroundColor: `#${idx%2===0 ? 'ffdddd' : 'ddddff'}`}}
-                  type="button"
-                  className={`btn btn-sm p-0 ${
-                    proofString === [g, idx] && `btn-primary`
-                  }`}
-                  onClick={() => setProofString([g, idx])}
-                >
+                <option onClick={() => setProofString([g.toString(), idx.toString()])} value={[g.toString(), idx.toString()]}>
                   {g.toString()}{" "}
                   {props.leaves && props.leaves[idx + 1].toString()}{" "}
                   {isContainerType(compType) &&
                     `: ${Object.keys(compType.fields)[idx]}`}{" "}
                   = [{getProofNodes(Number(g)).toString()}]
-                </button>
+                </option>
               );
             })}
-          </div>
+          </Select>{" "}
         </div>
         <div className="col-5">
           {proofString && merkleAccordionItem(proofString, tree, compType)}
@@ -103,7 +95,7 @@ export default function InfoTable(props: InfoTableProps) {
   }
 
   function merkleAccordionItem(
-    [g, idx]: [bigint, number],
+    [g, idx]: [string, string],
     tree: Tree,
     compType: CompositeType<any>
   ) {
@@ -111,17 +103,22 @@ export default function InfoTable(props: InfoTableProps) {
       <div>
         <h4>
           {g.toString()}
-          {props.leaves && props.leaves[idx + 1].toString()}{" "}
+          {props.leaves && props.leaves[Number(idx) + 1].toString()}{" "}
           {isContainerType(compType) &&
-            `: ${Object.keys(compType.fields)[idx]}`}{" "}
+            `: ${Object.keys(compType.fields)[Number(idx)]}`}{" "}
           {`->`} [{getProofNodes(Number(g)).toString()}]<br />
         </h4>
         <p className="text-break">
           [
-          {tree.getSingleProof(g).map((p, idx) => {
+          {tree.getSingleProof(BigInt(g)).map((p, idx) => {
             return (
-              <span style={{ backgroundColor: `#${idx%2===0 ? 'ffffff' : 'cccccc'}`}}>
-                {toHexString(p)}{idx !== tree.getSingleProof(g).length - 1 && `,`}
+              <span
+                style={{
+                  backgroundColor: `#${idx % 2 === 0 ? "ffffff" : "cccccc"}`,
+                }}
+              >
+                {toHexString(p)}
+                {idx !== tree.getSingleProof(BigInt(g)).length - 1 && `,`}
               </span>
             );
           })}
@@ -159,42 +156,15 @@ export default function InfoTable(props: InfoTableProps) {
         )} */}
         {props.top && json && (
           <div className="d-grid col-4 text-break overflow-auto">
-            <div className="accordion" id="jsonAccordion">
-              <div className="accorion-item">
-                <p className="accordion-header" id="jsonHeader">
-                  <button
-                    style={{ color: "white", backgroundColor: "gray" }}
-                    type="button"
-                    className="accordion-button collapsed"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#jsonBody"
-                    aria-expanded="false"
-                    aria-controls="jsonBody"
-                  >
-                    SAVE DATA AS JSON FILE
-                  </button>
-                </p>
-                <div
-                  id="jsonBody"
-                  className="accordion-collapse collapse"
-                  aria-labelledby="jsonHeader"
-                  data-bs-parent="#jsonAccordion"
-                >
-                  <div className="accordion-body">
-                    {" "}
                     <button
                       type="button"
                       onClick={() => downloadFile(json, "json")}
                     >
                       DOWNLOAD
                     </button>
-                    <br />
-                    {json}
+                    {/* <br />
+                    {json} */}
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
         )}
       </div>
 
